@@ -34,7 +34,7 @@ export default function UserDetailsPage() {
     }
 
     // Fetch user list
-    fetch("http://api.t-coin.code-studio4.com/api/users", {
+    fetch("https://api.t-coin.code-studio4.com/api/users", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -51,7 +51,7 @@ export default function UserDetailsPage() {
 
             // Fetch user balance
             fetch(
-              `http://api.t-coin.code-studio4.com/api/users/${foundUser.id}/user-balance`,
+              `https://api.t-coin.code-studio4.com/api/users/${foundUser.id}/user-balance`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,

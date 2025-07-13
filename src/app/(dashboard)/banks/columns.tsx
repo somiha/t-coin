@@ -82,7 +82,7 @@ function ViewBankDetails({ id }: { id: string }) {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        "http://api.t-coin.code-studio4.com/api/bank",
+        "https://api.t-coin.code-studio4.com/api/bank",
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await response.json();
@@ -178,7 +178,7 @@ function EditBankModal({ id }: { id: string }) {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        "http://api.t-coin.code-studio4.com/api/bank",
+        "https://api.t-coin.code-studio4.com/api/bank",
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await response.json();
@@ -227,7 +227,7 @@ function EditBankModal({ id }: { id: string }) {
       }
 
       const response = await fetch(
-        `http://api.t-coin.code-studio4.com/api/bank/update/${id}`,
+        `https://api.t-coin.code-studio4.com/api/bank/update/${id}`,
         {
           method: "PUT",
           headers: {
@@ -389,7 +389,7 @@ function DeleteBankModal({ id }: { id: string }) {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        `http://api.t-coin.code-studio4.com/api/bank/delete/${id}`,
+        `https://api.t-coin.code-studio4.com/api/bank/delete/${id}`,
         {
           method: "DELETE",
           headers: {

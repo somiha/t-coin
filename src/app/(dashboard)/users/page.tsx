@@ -26,7 +26,7 @@ export default function UsersPage() {
       return;
     }
 
-    fetch("http://api.t-coin.code-studio4.com/api/users", {
+    fetch("https://api.t-coin.code-studio4.com/api/users", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

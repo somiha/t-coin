@@ -84,8 +84,8 @@ export const columns: ColumnDef<Admin>[] = [
         try {
           const url =
             adminType === "super-admin"
-              ? `http://api.t-coin.code-studio4.com/api/super-admin/${user.id}/approve`
-              : `http://api.t-coin.code-studio4.com/api/admins/${user.id}/approve`;
+              ? `https://api.t-coin.code-studio4.com/api/super-admin/${user.id}/approve`
+              : `https://api.t-coin.code-studio4.com/api/admins/${user.id}/approve`;
           const response = await fetch(url, {
             method: "POST",
             headers: {

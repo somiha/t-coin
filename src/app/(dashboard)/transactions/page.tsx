@@ -42,7 +42,7 @@ export default function TransactionsPage() {
       return;
     }
 
-    fetch("http://api.t-coin.code-studio4.com/api/transaction-history", {
+    fetch("https://api.t-coin.code-studio4.com/api/transaction-history", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

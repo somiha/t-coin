@@ -33,7 +33,7 @@ export default function Categories() {
       return;
     }
 
-    fetch("http://api.t-coin.code-studio4.com/api/categories", {
+    fetch("https://api.t-coin.code-studio4.com/api/categories", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

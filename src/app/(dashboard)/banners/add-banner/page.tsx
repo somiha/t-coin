@@ -50,7 +50,7 @@ export default function AddBannerPage() {
     try {
       const token = localStorage.getItem("authToken"); // optional
       const response = await fetch(
-        "http://api.t-coin.code-studio4.com/api/banners",
+        "https://api.t-coin.code-studio4.com/api/banners",
         {
           method: "POST",
           headers: {

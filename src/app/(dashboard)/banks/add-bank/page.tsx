@@ -74,7 +74,7 @@ export default function AddBankPage() {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        "http://api.t-coin.code-studio4.com/api/bank/create",
+        "https://api.t-coin.code-studio4.com/api/bank/create",
         {
           method: "POST",
           headers: {

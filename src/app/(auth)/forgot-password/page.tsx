@@ -20,7 +20,7 @@ export default function ForgotPasswordPage() {
   const handleSendOTP = async () => {
     try {
       const res = await fetch(
-        "http://api.t-coin.code-studio4.com/api/admins/forgot-password",
+        "https://api.t-coin.code-studio4.com/api/admins/forgot-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
   const handleVerifyOTP = async () => {
     try {
       const res = await fetch(
-        "http://api.t-coin.code-studio4.com/api/admins/verify-otp",
+        "https://api.t-coin.code-studio4.com/api/admins/verify-otp",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
   const handleResetPIN = async () => {
     try {
       const res = await fetch(
-        "http://api.t-coin.code-studio4.com/api/admins/reset-password",
+        "https://api.t-coin.code-studio4.com/api/admins/reset-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

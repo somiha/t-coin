@@ -48,7 +48,7 @@ export default function ObjectsPage() {
 
       try {
         const response = await fetch(
-          "http://api.t-coin.code-studio4.com/api/objects",
+          "https://api.t-coin.code-studio4.com/api/objects",
           {
             headers: {
               Authorization: `Bearer ${token}`,

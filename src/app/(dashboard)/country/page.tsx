@@ -29,7 +29,7 @@ export default function Countries() {
     }
 
     // Fetching countries data from API
-    fetch("http://api.t-coin.code-studio4.com/api/country", {
+    fetch("https://api.t-coin.code-studio4.com/api/country", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

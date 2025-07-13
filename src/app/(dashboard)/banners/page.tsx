@@ -29,7 +29,7 @@ export default function Banners() {
       return;
     }
 
-    fetch("http://api.t-coin.code-studio4.com/api/banners", {
+    fetch("https://api.t-coin.code-studio4.com/api/banners", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

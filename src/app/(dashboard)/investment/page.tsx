@@ -32,7 +32,7 @@ export default function InvestmentPage() {
       return;
     }
 
-    fetch("http://api.t-coin.code-studio4.com/api/investment-projects", {
+    fetch("https://api.t-coin.code-studio4.com/api/investment-projects", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

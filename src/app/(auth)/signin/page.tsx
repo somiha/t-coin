@@ -57,8 +57,8 @@ export default function SignInPage() {
 
     try {
       const url = isSuperAdmin
-        ? "http://api.t-coin.code-studio4.com/api/super-admin/signin"
-        : "http://api.t-coin.code-studio4.com/api/admins/signin";
+        ? "https://api.t-coin.code-studio4.com/api/super-admin/signin"
+        : "https://api.t-coin.code-studio4.com/api/admins/signin";
 
       const response = await fetch(url, {
         method: "POST",

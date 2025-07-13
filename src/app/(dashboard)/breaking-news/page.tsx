@@ -39,7 +39,7 @@ export default function BreakingNewsPage() {
 
       try {
         const response = await fetch(
-          "http://api.t-coin.code-studio4.com/api/breaking-news",
+          "https://api.t-coin.code-studio4.com/api/breaking-news",
           {
             headers: { Authorization: `Bearer ${token}` },
           }

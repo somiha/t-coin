@@ -84,7 +84,7 @@ function EditNewsModal({ id }: { id: string }) {
       const token = localStorage.getItem("authToken");
       // First fetch all news
       const response = await fetch(
-        "http://api.t-coin.code-studio4.com/api/breaking-news",
+        "https://api.t-coin.code-studio4.com/api/breaking-news",
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await response.json();
@@ -119,7 +119,7 @@ function EditNewsModal({ id }: { id: string }) {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        `http://api.t-coin.code-studio4.com/api/breaking-news/${id}`,
+        `https://api.t-coin.code-studio4.com/api/breaking-news/${id}`,
         {
           method: "PUT",
           headers: {
@@ -211,7 +211,7 @@ function DeleteNewsModal({ id }: { id: string }) {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        `http://api.t-coin.code-studio4.com/api/breaking-news/${id}`,
+        `https://api.t-coin.code-studio4.com/api/breaking-news/${id}`,
         {
           method: "DELETE",
           headers: {

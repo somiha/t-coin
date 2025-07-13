@@ -77,7 +77,7 @@ function EditCountryModal({ country }: { country: Country }) {
 
     try {
       const response = await fetch(
-        `http://api.t-coin.code-studio4.com/api/country/${country.id}`,
+        `https://api.t-coin.code-studio4.com/api/country/${country.id}`,
         {
           method: "PUT",
           headers: {
@@ -157,7 +157,7 @@ function DeleteCountryModal({ country }: { country: Country }) {
 
     try {
       const response = await fetch(
-        `http://api.t-coin.code-studio4.com/api/country/${country.id}`,
+        `https://api.t-coin.code-studio4.com/api/country/${country.id}`,
         {
           method: "DELETE",
           headers: {

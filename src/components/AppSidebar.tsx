@@ -11,9 +11,6 @@ import {
   Handshake,
   PiggyBank,
   Trophy,
-  Gamepad,
-  BookOpen,
-  Plane,
   Film,
   MessageSquare,
   MoreHorizontal,
@@ -77,9 +74,6 @@ const baseMenuItems: MenuItem[] = [
   { name: "Agent List", icon: Handshake, href: "/agents" },
   { name: "Savings", icon: PiggyBank, href: "/savings" },
   { name: "Messages", icon: MessageSquare, href: "/messages" },
-  { name: "Gaming", icon: Gamepad, href: "/gaming" },
-  { name: "Educational Platforms", icon: BookOpen, href: "/education" },
-  { name: "Travel Platforms", icon: Plane, href: "/travel" },
 ];
 
 const superAdminItems: MenuItem[] = [

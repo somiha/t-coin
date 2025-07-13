@@ -113,7 +113,7 @@ function EditBannerModal({ banner }: { banner: Banner }) {
 
     try {
       const response = await fetch(
-        `http://api.t-coin.code-studio4.com/api/banners/${banner.id}`,
+        `https://api.t-coin.code-studio4.com/api/banners/${banner.id}`,
         {
           method: "PUT",
           headers: {
@@ -225,7 +225,7 @@ function DeleteBannerModal({ banner }: { banner: Banner }) {
 
     try {
       const response = await fetch(
-        `http://api.t-coin.code-studio4.com/api/banners/${banner.id}`,
+        `https://api.t-coin.code-studio4.com/api/banners/${banner.id}`,
         {
           method: "DELETE",
           headers: {

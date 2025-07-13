@@ -29,7 +29,7 @@ export default function Page() {
       return;
     }
     const user = JSON.parse(userStr);
-    const url = `http://api.t-coin.code-studio4.com/api/super-admin/user-list/${user.id}`;
+    const url = `https://api.t-coin.code-studio4.com/api/super-admin/user-list/${user.id}`;
 
     fetch(url, {
       headers: {

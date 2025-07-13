@@ -45,7 +45,7 @@ export default function BanksPage() {
 
       try {
         const response = await fetch(
-          "http://api.t-coin.code-studio4.com/api/bank",
+          "https://api.t-coin.code-studio4.com/api/bank",
           {
             headers: { Authorization: `Bearer ${token}` },
           }

@@ -55,7 +55,7 @@ export default function AddVideoPage() {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        "http://api.t-coin.code-studio4.com/api/video-tutorial",
+        "https://api.t-coin.code-studio4.com/api/video-tutorial",
         {
           method: "POST",
           headers: {

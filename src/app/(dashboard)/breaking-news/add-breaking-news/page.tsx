@@ -27,7 +27,7 @@ export default function AddBreakingNewsPage() {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        "http://api.t-coin.code-studio4.com/api/breaking-news",
+        "https://api.t-coin.code-studio4.com/api/breaking-news",
         {
           method: "POST",
           headers: {

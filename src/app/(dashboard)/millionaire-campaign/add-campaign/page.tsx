@@ -77,7 +77,7 @@ export default function AddCampaign() {
       }
 
       const response = await fetch(
-        "http://api.t-coin.code-studio4.com/api/campaign/create",
+        "https://api.t-coin.code-studio4.com/api/campaign/create",
         {
           method: "POST",
           body: formDataToSend,

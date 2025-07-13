@@ -34,7 +34,7 @@ export default function InvestmentDetails() {
     if (!investmentId) return;
 
     fetch(
-      `http://api.t-coin.code-studio4.com/api/investment-projects/${investmentId}`
+      `https://api.t-coin.code-studio4.com/api/investment-projects/${investmentId}`
     )
       .then((res) => res.json())
       .then((response) => {

@@ -24,7 +24,7 @@ export default function VideoPage() {
     const token = localStorage.getItem("authToken");
     if (!token) return;
 
-    fetch("http://api.t-coin.code-studio4.com/api/video-tutorial", {
+    fetch("https://api.t-coin.code-studio4.com/api/video-tutorial", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
