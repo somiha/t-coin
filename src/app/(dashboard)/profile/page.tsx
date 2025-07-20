@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { Loader2, Eye } from "lucide-react";
+import Image from "next/image";
 
 interface ProfileData {
   full_name: string;
@@ -306,10 +307,12 @@ export default function ProfilePage() {
                       {profileData.nid_card_front ? (
                         <div className="flex-1">
                           <div className="relative aspect-[4/3] w-full max-w-md border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
-                            <img
+                            <Image
                               src={profileData.nid_card_front || ""}
                               alt="NID Front"
                               className="w-full h-full object-contain"
+                              width={150}
+                              height={140}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end p-4">
                               <a
@@ -351,10 +354,12 @@ export default function ProfilePage() {
                       {profileData.nid_card_back ? (
                         <div className="flex-1">
                           <div className="relative aspect-[4/3] w-full max-w-md border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
-                            <img
+                            <Image
                               src={profileData.nid_card_back || ""}
                               alt="NID Back"
                               className="w-full h-full object-contain"
+                              width={150}
+                              height={140}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end p-4">
                               <a
@@ -394,10 +399,11 @@ export default function ProfilePage() {
                       {profileData.passport ? (
                         <div className="flex-1">
                           <div className="relative aspect-[4/3] w-full max-w-md border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
-                            <img
+                            <Image
                               src={profileData.passport || ""}
                               alt="Passport"
-                              className="w-full h-full object-contain"
+                              width={150}
+                              height={140}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end p-4">
                               <a

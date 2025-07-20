@@ -89,7 +89,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="/avatars/admin.png" alt="Admin" />
-                    <AvatarFallback></AvatarFallback>
+                    <AvatarFallback> {name?.charAt(0) || "A"}</AvatarFallback>
                   </Avatar>
                   <div className="hidden md:flex flex-col items-start">
                     <span className="text-sm font-medium bg-gradient-to-r from-[#3F1729] via-[#71113D] to-[#D4136B] text-transparent bg-clip-text">
