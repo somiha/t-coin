@@ -1,6 +1,6 @@
-import { TransactionsTable } from "./_components/transaction-table";
+import { TransactionsTable } from "../_components/transaction-table";
 
-export default function AllTransactionsPage() {
+export default function CashOutPage() {
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
@@ -8,10 +8,10 @@ export default function AllTransactionsPage() {
           <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold tracking-tight">
-                All Transactions
+                Send Money Transactions
               </h1>
             </div>
-            <TransactionsTable />
+            <TransactionsTable type="Cash Out" />
           </div>
         </main>
       </div>

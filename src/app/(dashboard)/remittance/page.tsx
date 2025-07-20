@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { columns, Remittance } from "./columns";
-import { DataTable } from "./data-table";
+import { DataTable } from "../data-table";
 import { Button } from "@/components/ui/button";
 import {
   Popover,

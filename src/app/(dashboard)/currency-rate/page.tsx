@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { columns } from "./columns";
-import { DataTable } from "./data-table";
+import { DataTable } from "../data-table";
 import type { Currency } from "./columns";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";

@@ -1,5 +1,5 @@
 import { columns } from "./columns";
-import { DataTable } from "./data-table";
+import { DataTable } from "../data-table";
 import type { Result } from "./columns";
 
 const result: Result[] = [

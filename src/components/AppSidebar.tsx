@@ -54,10 +54,9 @@ const baseMenuItems: MenuItem[] = [
     icon: CreditCard,
     subItems: [
       { name: "All", href: "/transactions" },
-      { name: "Remittance", href: "/remittance" },
-      { name: "Send Money", href: "/transactions/send" },
+      { name: "Remittance", href: "/transactions/remittance" },
+      { name: "Send Money", href: "/transactions/send-money" },
       { name: "Cash Out", href: "/transactions/cash-out" },
-      { name: "Received Money", href: "/transactions/received" },
     ],
   },
   { name: "Currency Rate", icon: TrendingUp, href: "/currency-rate" },
@@ -69,27 +68,33 @@ const baseMenuItems: MenuItem[] = [
   { name: "Objects", icon: MoreHorizontal, href: "/object" },
   { name: "Banks", icon: MoreHorizontal, href: "/banks" },
   { name: "Breaking News", icon: MoreHorizontal, href: "/breaking-news" },
-  { name: "Notifications", icon: Bell, href: "/notifications" },
-  { name: "Investor List", icon: List, href: "/investors" },
+  // { name: "Notifications", icon: Bell, href: "/notifications" },
+  // { name: "Investor List", icon: List, href: "/investors" },
+  // { name: "Savings", icon: PiggyBank, href: "/savings" },
+  // { name: "Messages", icon: MessageSquare, href: "/messages" },
+];
+
+const adminItems: MenuItem[] = [
   { name: "Agent List", icon: Handshake, href: "/agents" },
-  { name: "Savings", icon: PiggyBank, href: "/savings" },
-  { name: "Messages", icon: MessageSquare, href: "/messages" },
 ];
 
 const superAdminItems: MenuItem[] = [
-  { name: "Admin List", icon: Users, href: "/admins" },
+  { name: "Admin & Agent List", icon: Users, href: "/admins" },
 ];
 
 const AppSidebar = () => {
   const { isSuperAdmin } = useUser();
 
   // Combine menu items, removing duplicates
+  // const menuItems = [
+  //   ...baseMenuItems.filter((item) => item.name !== "Add Admin"), // Remove Add Admin from base if present
+  //   ...(isSuperAdmin ? superAdminItems : []),
+
   const menuItems = [
-    ...baseMenuItems.filter((item) => item.name !== "Add Admin"), // Remove Add Admin from base if present
+    ...baseMenuItems,
+    ...(!isSuperAdmin ? adminItems : []),
     ...(isSuperAdmin ? superAdminItems : []),
   ];
-  console.log("isSuperAdmin in sidebar:", isSuperAdmin);
-  console.log("Menu items:", menuItems);
 
   return (
     <Sidebar collapsible="offcanvas">

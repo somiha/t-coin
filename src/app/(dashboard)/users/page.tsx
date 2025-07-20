@@ -1,7 +1,7 @@
 "use client";
 
 import { columns, User } from "./columns";
-import { DataTable } from "./data-table";
+import { DataTable } from "../data-table";
 import { useEffect, useState } from "react";
 
 interface UserApiResponse {

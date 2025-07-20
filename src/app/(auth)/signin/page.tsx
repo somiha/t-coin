@@ -79,7 +79,7 @@ export default function SignInPage() {
         }
 
         if (data?.data?.user) {
-          console.log("5Storing user:", data.data.user);
+          console.log("Storing user:", data.data.user);
           localStorage.setItem("authToken", data.data.token);
           localStorage.setItem("user", JSON.stringify(data.data.user));
 

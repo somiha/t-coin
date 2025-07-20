@@ -1,4 +1,4 @@
-"use client"; // (only for App Router)
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -6,27 +6,31 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
-
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [newPin, setNewPin] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  const getBaseUrl = () => {
+    return isSuperAdmin
+      ? "https://api.t-coin.code-studio4.com/api/super-admin"
+      : "https://api.t-coin.code-studio4.com/api/admins";
+  };
 
   const handleSendOTP = async () => {
     try {
-      const res = await fetch(
-        "https://api.t-coin.code-studio4.com/api/admins/forgot-password",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        }
-      );
+      const res = await fetch(`${getBaseUrl()}/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
       const data = await res.json();
       if (res.ok) {
         setSuccess("OTP sent successfully.");
@@ -42,14 +46,11 @@ export default function ForgotPasswordPage() {
 
   const handleVerifyOTP = async () => {
     try {
-      const res = await fetch(
-        "https://api.t-coin.code-studio4.com/api/admins/verify-otp",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, otp }),
-        }
-      );
+      const res = await fetch(`${getBaseUrl()}/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      });
       const data = await res.json();
       if (res.ok) {
         setSuccess("OTP verified. Set your new PIN.");
@@ -65,14 +66,11 @@ export default function ForgotPasswordPage() {
 
   const handleResetPIN = async () => {
     try {
-      const res = await fetch(
-        "https://api.t-coin.code-studio4.com/api/admins/reset-password",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, otp, newPinNumber: newPin }),
-        }
-      );
+      const res = await fetch(`${getBaseUrl()}/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp, newPinNumber: newPin }),
+      });
       const data = await res.json();
       if (res.ok) {
         setSuccess("PIN reset successfully. Redirecting to login...");
@@ -98,6 +96,15 @@ export default function ForgotPasswordPage() {
 
           {error && <p className="text-sm text-red-600">{error}</p>}
           {success && <p className="text-sm text-green-600">{success}</p>}
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="super-admin"
+              checked={isSuperAdmin}
+              onCheckedChange={(checked) => setIsSuperAdmin(!!checked)}
+            />
+            <Label htmlFor="super-admin">Super Admin</Label>
+          </div>
 
           {step === 1 && (
             <div className="space-y-3">

@@ -11,13 +11,14 @@ import {
 import { SidebarTrigger } from "./ui/sidebar";
 
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Search } from "lucide-react";
-import { Bell } from "lucide-react";
+// import { Input } from "./ui/input";
+// import { Search } from "lucide-react";
+// import { Bell } from "lucide-react";
 
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Navbar() {
   const router = useRouter();
@@ -51,7 +52,7 @@ export default function Navbar() {
         {/* Combined SidebarTrigger and Search (both mobile and desktop) */}
         <div className="flex items-center gap-2">
           <SidebarTrigger />
-          <div className="flex items-center">
+          {/* <div className="flex items-center">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <Input
@@ -66,12 +67,12 @@ export default function Navbar() {
               <span className="sr-only md:not-sr-only">Search</span>
               <Search className="h-4 w-4 md:hidden" />
             </Button>
-          </div>
+          </div> */}
         </div>
 
         {/* USER MENU (right side) */}
         <div className="flex items-center gap-4">
-          <Button
+          {/* <Button
             variant="ghost"
             size="icon"
             className="relative p-0 hidden sm:flex"
@@ -80,7 +81,7 @@ export default function Navbar() {
               <Bell className="h-4 w-4 text-white" />
             </div>
             <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))]"></span>
-          </Button>
+          </Button> */}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -88,7 +89,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="/avatars/admin.png" alt="Admin" />
-                    <AvatarFallback>AD</AvatarFallback>
+                    <AvatarFallback></AvatarFallback>
                   </Avatar>
                   <div className="hidden md:flex flex-col items-start">
                     <span className="text-sm font-medium bg-gradient-to-r from-[#3F1729] via-[#71113D] to-[#D4136B] text-transparent bg-clip-text">
@@ -103,8 +104,10 @@ export default function Navbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/profile">Profile</Link>
+              </DropdownMenuItem>
+
               <DropdownMenuItem
                 className="text-red-500 focus:text-red-500"
                 onClick={handleLogout}

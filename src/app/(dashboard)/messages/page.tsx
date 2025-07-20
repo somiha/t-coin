@@ -1,5 +1,5 @@
 import { columns } from "./columns";
-import { DataTable } from "./data-table";
+import { DataTable } from "../data-table";
 import type { Messages } from "./columns";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";

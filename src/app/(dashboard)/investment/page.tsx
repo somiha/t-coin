@@ -1,7 +1,7 @@
 "use client";
 
 import { columns } from "./columns";
-import { DataTable } from "./data-table";
+import { DataTable } from "../data-table";
 import type { Investment } from "./columns";
 import { useEffect, useState } from "react";
 import Link from "next/link";

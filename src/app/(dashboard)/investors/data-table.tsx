@@ -15,10 +15,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
+// import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 
-import { Search } from "lucide-react";
+// import { Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -42,10 +42,10 @@ export function DataTable<TData, TValue>({
   return (
     <Card className="p-4 mt-5">
       <div className="mb-4">
-        <div className="mb-4 relative">
+        {/* <div className="mb-4 relative">
           <Input placeholder="Search User" className="max-w-sm pl-10" />
           <Search className="absolute p-1 h-6 w-6 text-gray-400 left-2 top-2" />
-        </div>
+        </div> */}
       </div>
       <div className="overflow-x-auto">
         <Table>

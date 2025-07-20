@@ -1,21 +1,91 @@
+// app/(dashboard)/agents/columns.tsx
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
-import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox";
-import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { Eye } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useState } from "react";
 
 export type Agent = {
   id: string;
   name: string;
   email: string;
   phone: string;
-  country: string;
-  address: string;
-  avatar: string;
+  type: "agent";
+  isApproved: boolean;
+  canReceiveRemittance?: boolean;
 };
+
+function ViewAgentModal({ agent }: { agent: Agent }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+      <Button size="sm" variant="outline" onClick={() => setIsOpen(true)}>
+        <Eye className="h-4 w-4 mr-2" />
+        View
+      </Button>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="sm:max-w-[625px]">
+          <DialogHeader>
+            <DialogTitle>Agent Details</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium">Name</p>
+                <p className="text-sm">{agent.name}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">Email</p>
+                <p className="text-sm">{agent.email}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">Phone</p>
+                <p className="text-sm">{agent.phone}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">Status</p>
+                <Badge
+                  variant="secondary"
+                  className={`${
+                    agent.isApproved
+                      ? "bg-green-100 text-green-800"
+                      : "bg-yellow-100 text-yellow-800"
+                  }`}
+                >
+                  {agent.isApproved ? "Approved" : "Pending"}
+                </Badge>
+              </div>
+              <div>
+                <p className="text-sm font-medium">Can Receive Remittance</p>
+                <Badge
+                  variant="secondary"
+                  className={`${
+                    agent.canReceiveRemittance
+                      ? "bg-blue-100 text-blue-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {agent.canReceiveRemittance ? "Yes" : "No"}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
 
 export const columns: ColumnDef<Agent>[] = [
   {
@@ -42,23 +112,8 @@ export const columns: ColumnDef<Agent>[] = [
   },
   {
     accessorKey: "id",
-    header: "Agent Id",
+    header: "ID",
   },
-  {
-    id: "avatar",
-    header: () => null,
-    cell: ({ row }) => (
-      <div className="w-10 h-10 relative rounded-full overflow-hidden">
-        <Image
-          src={row.original.avatar}
-          alt={row.original.name}
-          fill
-          className="object-cover"
-        />
-      </div>
-    ),
-  },
-
   {
     accessorKey: "name",
     header: "Full Name",
@@ -69,31 +124,43 @@ export const columns: ColumnDef<Agent>[] = [
   },
   {
     accessorKey: "phone",
-    header: "Mobile Number",
+    header: "Phone",
   },
   {
-    accessorKey: "country",
-    header: "Country",
+    accessorKey: "isApproved",
+    header: "Status",
+    cell: ({ row }) => (
+      <Badge
+        variant="secondary"
+        className={`${
+          row.original.isApproved
+            ? "bg-green-100 text-green-800"
+            : "bg-yellow-100 text-yellow-800"
+        }`}
+      >
+        {row.original.isApproved ? "Approved" : "Pending"}
+      </Badge>
+    ),
   },
   {
-    accessorKey: "address",
-    header: "Address",
+    accessorKey: "canReceiveRemittance",
+    header: "Can Receive Remittance",
+    cell: ({ row }) => (
+      <Badge
+        variant="secondary"
+        className={`${
+          row.original.canReceiveRemittance
+            ? "bg-blue-100 text-blue-800"
+            : "bg-gray-100 text-gray-800"
+        }`}
+      >
+        {row.original.canReceiveRemittance ? "Yes" : "No"}
+      </Badge>
+    ),
   },
   {
-    id: "action",
-    header: "Action",
-    cell: ({ row }) => {
-      const agentId = row.original.id;
-      return (
-        <Link href={`/agents/${agentId}`}>
-          <Button
-            size="icon"
-            className="text-white bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] hover:opacity-90 cursor-pointer transition-opacity"
-          >
-            <Eye className="w-4 h-4" />
-          </Button>
-        </Link>
-      );
-    },
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => <ViewAgentModal agent={row.original} />,
   },
 ];
