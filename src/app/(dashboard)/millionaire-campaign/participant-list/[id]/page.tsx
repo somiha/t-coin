@@ -1,7 +1,7 @@
 "use client";
 
 import { columns } from "./columns";
-import { DataTable } from "../data-table";
+import { DataTable } from "../../../data-table";
 import type { Participant } from "./columns";
 import { useEffect, useState } from "react";
 
