@@ -19,6 +19,10 @@ interface ProfileData {
   nid_card_front: string;
   nid_card_back: string;
   passport: string;
+  nid_card_front_pic_url: string;
+  nid_card_back_pic_url: string;
+  passport_file_url: string;
+  tcoin_balance: string;
 }
 
 export default function ProfilePage() {
@@ -36,6 +40,10 @@ export default function ProfilePage() {
     nid_card_front: "",
     nid_card_back: "",
     passport: "",
+    nid_card_front_pic_url: "",
+    nid_card_back_pic_url: "",
+    passport_file_url: "",
+    tcoin_balance: "",
   });
 
   useEffect(() => {
@@ -64,6 +72,10 @@ export default function ProfilePage() {
           nid_card_front: users?.nid_card_front_pic_url || "",
           nid_card_back: users?.nid_card_back_pic_url || "",
           passport: users?.passport_file_url || "",
+          nid_card_front_pic_url: users?.nid_card_front_pic_url || "",
+          nid_card_back_pic_url: users?.nid_card_back_pic_url || "",
+          passport_file_url: users?.passport_file_url || "",
+          tcoin_balance: users?.tcoin_balance || "",
         });
       } catch (error) {
         toast.error("Failed to load profile");
@@ -145,6 +157,10 @@ export default function ProfilePage() {
           nid_card_front: data.data.nid_card_front_pic_url,
           nid_card_back: data.data.nid_card_back_pic_url,
           passport: data.data.passport_file_url,
+          nid_card_front_pic_url: data.data.nid_card_front_pic_url,
+          nid_card_back_pic_url: data.data.nid_card_back_pic_url,
+          passport_file_url: data.data.passport_file_url,
+          tcoin_balance: data.data.tcoin_balance,
         });
       }
 
@@ -290,6 +306,20 @@ export default function ProfilePage() {
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
                     />
                   </div> */}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="t-coin" className="font-medium">
+                      TCoin Balance
+                    </Label>
+                    <input
+                      id="t-coin"
+                      name="t-coin"
+                      type="number"
+                      value={profileData.tcoin_balance || ""}
+                      readOnly
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                    />
+                  </div>
                 </div>
 
                 {/* Document Uploads */}

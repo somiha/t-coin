@@ -68,6 +68,21 @@ const baseMenuItems: MenuItem[] = [
   { name: "Objects", icon: MoreHorizontal, href: "/object" },
   { name: "Banks", icon: MoreHorizontal, href: "/banks" },
   { name: "Breaking News", icon: MoreHorizontal, href: "/breaking-news" },
+  {
+    name: "Terms & Conditions",
+    icon: MoreHorizontal,
+    href: "/terms-conditions",
+  },
+  {
+    name: "Privacy & Policy",
+    icon: MoreHorizontal,
+    href: "/privacy-policy",
+  },
+  {
+    name: "Additional Charges",
+    icon: MoreHorizontal,
+    href: "/additional-charges",
+  },
   // { name: "Notifications", icon: Bell, href: "/notifications" },
   // { name: "Investor List", icon: List, href: "/investors" },
   // { name: "Savings", icon: PiggyBank, href: "/savings" },
@@ -76,10 +91,13 @@ const baseMenuItems: MenuItem[] = [
 
 const adminItems: MenuItem[] = [
   { name: "Agent List", icon: Handshake, href: "/agents" },
+  { name: "Agent Money to Tcoin", icon: Users, href: "/agent-money-to-tcoin" },
+  { name: "Admin Tcoin to money", icon: Users, href: "/admin-tcoin-to-money" },
 ];
 
 const superAdminItems: MenuItem[] = [
   { name: "Admin & Agent List", icon: Users, href: "/admins" },
+  { name: "Admin Money to Tcoin", icon: Users, href: "/admin-money-to-tcoin" },
 ];
 
 const AppSidebar = () => {

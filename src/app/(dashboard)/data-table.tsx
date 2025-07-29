@@ -28,6 +28,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  loading?: boolean;
+  error?: string | null;
 }
 
 export function DataTable<TData, TValue>({

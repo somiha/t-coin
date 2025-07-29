@@ -1,9 +1,9 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { UserActions } from "./userActions";
 
 export type User = {
   id: string;
@@ -12,7 +12,25 @@ export type User = {
   phone: string;
   type: "admin" | "agent";
   isApproved: boolean;
-  canReceiveRemittance?: boolean;
+  canReceiveRemittanceList?: boolean;
+  image?: string | null;
+  address?: string | null;
+  city?: string | null;
+  country?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  nid_card_number?: string | null;
+  nid_card_front_pic_url?: string | null;
+  nid_card_back_pic_url?: string | null;
+  passport_file_url?: string | null;
+  qr_code?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  tcoin_balance?: string;
+  local_currency_balance?: string;
+  accepted_terms?: boolean;
+  birth_date?: string | null;
+  institution_name?: string | null;
 };
 
 export const columns: ColumnDef<User>[] = [
@@ -85,84 +103,24 @@ export const columns: ColumnDef<User>[] = [
     ),
   },
   {
-    accessorKey: "canReceiveRemittance",
+    accessorKey: "canReceiveRemittanceList",
     header: "Can Receive Remittance",
     cell: ({ row }) =>
       row.original.type === "agent" ? (
         <Badge
           className={`px-2 py-1 rounded-md ${
-            row.original.canReceiveRemittance
+            row.original.canReceiveRemittanceList
               ? "bg-green-100 text-green-700"
               : "bg-red-100 text-red-700"
           }`}
         >
-          {row.original.canReceiveRemittance ? "Yes" : "No"}
+          {row.original.canReceiveRemittanceList ? "Yes" : "No"}
         </Badge>
       ) : null,
   },
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row }) => {
-      const user = row.original;
-
-      const handleApprove = async () => {
-        const userStr = localStorage.getItem("user");
-        const token = localStorage.getItem("authToken");
-        const adminType = localStorage.getItem("adminType");
-
-        if (!userStr || !token || !adminType) {
-          alert("Authorization error. Please log in again.");
-          return;
-        }
-
-        const currentUser = JSON.parse(userStr);
-        console.log("currentUser", currentUser);
-
-        try {
-          const response = await fetch(
-            `https://api.t-coin.code-studio4.com/api/super-admin/${currentUser.id}/approve`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                approveUserId: parseInt(user.id),
-                type: user.type,
-                approveStatus: true,
-              }),
-            }
-          );
-
-          const data = await response.json();
-
-          if (response.ok) {
-            alert(`${user.type.toUpperCase()} approved successfully`);
-            window.location.reload();
-          } else {
-            alert(data.message || "Approval failed");
-          }
-        } catch (error) {
-          console.error("Approval error:", error);
-          alert("Something went wrong. Try again.");
-        }
-      };
-
-      return (
-        <div className="flex gap-2">
-          {!user.isApproved && (
-            <Button
-              size="sm"
-              className="bg-green-600 text-white hover:bg-green-700"
-              onClick={handleApprove}
-            >
-              Approve
-            </Button>
-          )}
-        </div>
-      );
-    },
+    cell: ({ row }) => <UserActions user={row.original} />,
   },
 ];

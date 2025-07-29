@@ -85,7 +85,7 @@ export default function SignInPage() {
 
           localStorage.setItem(
             "adminType",
-            isSuperAdmin ? "super-admin" : "admin"
+            isSuperAdmin ? "super_admin" : "admin"
           );
 
           if (data.data.user.type) {

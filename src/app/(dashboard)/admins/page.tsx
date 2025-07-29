@@ -6,6 +6,7 @@ import type { User } from "./columns";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ApiUser {
   id: number;
@@ -14,8 +15,25 @@ interface ApiUser {
   phone_no: string;
   isApproved: boolean;
   type: "admin" | "agent";
-  image?: string | null;
   canReceiveRemittanceList?: boolean;
+  image?: string | null;
+  address?: string | null;
+  city?: string | null;
+  country?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  nid_card_number?: string | null;
+  nid_card_front_pic_url?: string | null;
+  nid_card_back_pic_url?: string | null;
+  passport_file_url?: string | null;
+  qr_code?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  tcoin_balance?: string;
+  local_currency_balance?: string;
+  accepted_terms?: boolean;
+  birth_date?: string | null;
+  institution_name?: string | null;
 }
 
 interface ApiResponse {
@@ -27,59 +45,115 @@ interface ApiResponse {
 }
 
 export default function Page() {
+  const [activeTab, setActiveTab] = useState<"admin" | "agent">("admin");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
       const userStr = localStorage.getItem("user");
       const token = localStorage.getItem("authToken");
       const adminType = localStorage.getItem("adminType");
 
       if (!userStr || !token || !adminType) {
-        console.error("Missing credentials");
-        setLoading(false);
-        return;
+        throw new Error("Authorization error");
       }
 
-      try {
-        const user = JSON.parse(userStr);
-        const response = await fetch(
-          `https://api.t-coin.code-studio4.com/api/super-admin/user-list/${user.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const data: ApiResponse = await response.json();
-        if (data.success && data.data) {
-          const allUsers = [
-            ...(data.data.admins || []),
-            ...(data.data.agents || []),
-          ].map(
-            (user): User => ({
-              id: user.id.toString(),
-              name: user.full_name,
-              email: user.email,
-              phone: user.phone_no,
-              type: user.type,
-              isApproved: user.isApproved,
-              canReceiveRemittance: user.canReceiveRemittanceList || false,
-            })
-          );
-          setUsers(allUsers);
+      const user = JSON.parse(userStr);
+      const response = await fetch(
+        `https://api.t-coin.code-studio4.com/api/super-admin/user-list/${user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (error) {
-        console.error("Fetch error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      );
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data: ApiResponse = await response.json();
+
+      if (!data.success) {
+        throw new Error("Failed to fetch users");
+      }
+
+      const allUsers = [
+        ...(data.data.admins || []).map((u: ApiUser) => ({
+          id: u.id.toString(),
+          name: u.full_name,
+          email: u.email,
+          phone: u.phone_no,
+          type: "admin" as const,
+          isApproved: u.isApproved,
+          canReceiveRemittanceList: u.canReceiveRemittanceList || false,
+          image: u.image,
+          address: u.address,
+          city: u.city,
+          country: u.country,
+          state: u.state,
+          zip_code: u.zip_code,
+          nid_card_number: u.nid_card_number,
+          nid_card_front_pic_url: u.nid_card_front_pic_url,
+          nid_card_back_pic_url: u.nid_card_back_pic_url,
+          passport_file_url: u.passport_file_url,
+          qr_code: u.qr_code,
+          createdAt: u.createdAt,
+          updatedAt: u.updatedAt,
+          tcoin_balance: u.tcoin_balance,
+          local_currency_balance: u.local_currency_balance,
+          accepted_terms: u.accepted_terms,
+          birth_date: u.birth_date,
+          institution_name: u.institution_name,
+        })),
+        ...(data.data.agents || []).map((u: ApiUser) => ({
+          id: u.id.toString(),
+          name: u.full_name,
+          email: u.email,
+          phone: u.phone_no,
+          type: "agent" as const,
+          isApproved: u.isApproved,
+          canReceiveRemittanceList: u.canReceiveRemittanceList || false,
+          image: u.image,
+          address: u.address,
+          city: u.city,
+          country: u.country,
+          state: u.state,
+          zip_code: u.zip_code,
+          nid_card_number: u.nid_card_number,
+          nid_card_front_pic_url: u.nid_card_front_pic_url,
+          nid_card_back_pic_url: u.nid_card_back_pic_url,
+          passport_file_url: u.passport_file_url,
+          qr_code: u.qr_code,
+          createdAt: u.createdAt,
+          updatedAt: u.updatedAt,
+          tcoin_balance: u.tcoin_balance,
+          local_currency_balance: u.local_currency_balance,
+          accepted_terms: u.accepted_terms,
+          birth_date: u.birth_date,
+          institution_name: u.institution_name,
+        })),
+      ];
+      setUsers(allUsers);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUsers();
   }, []);
+
+  const filteredUsers = users.filter((user) => user.type === activeTab);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -88,7 +162,7 @@ export default function Page() {
           <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold tracking-tight">
-                All Admins and Agents
+                Admin Management
               </h1>
               <Link href="/admins/add-admin">
                 <Button className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90">
@@ -96,13 +170,43 @@ export default function Page() {
                 </Button>
               </Link>
             </div>
-            {loading ? (
-              <div className="flex items-center justify-center h-64">
-                <p>Loading users...</p>
-              </div>
-            ) : (
-              <DataTable columns={columns} data={users} />
-            )}
+
+            <Tabs
+              defaultValue="admin"
+              onValueChange={(value) =>
+                setActiveTab(value as "admin" | "agent")
+              }
+              className="w-full"
+            >
+              <TabsList className="grid w-6/12 grid-cols-2">
+                <TabsTrigger value="admin">Admins</TabsTrigger>
+                <TabsTrigger value="agent">Agents</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="admin">
+                {loading ? (
+                  <div className="flex justify-center items-center h-64">
+                    <p>Loading admins...</p>
+                  </div>
+                ) : error ? (
+                  <div className="text-red-500 p-4">{error}</div>
+                ) : (
+                  <DataTable columns={columns} data={filteredUsers} />
+                )}
+              </TabsContent>
+
+              <TabsContent value="agent">
+                {loading ? (
+                  <div className="flex justify-center items-center h-64">
+                    <p>Loading agents...</p>
+                  </div>
+                ) : error ? (
+                  <div className="text-red-500 p-4">{error}</div>
+                ) : (
+                  <DataTable columns={columns} data={filteredUsers} />
+                )}
+              </TabsContent>
+            </Tabs>
           </div>
         </main>
       </div>

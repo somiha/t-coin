@@ -1,10 +1,11 @@
 // app/(dashboard)/agents/page.tsx
 "use client";
 
-import { columns } from "./columns";
 import { DataTable } from "../data-table";
-import type { Agent } from "./columns";
 import { useEffect, useState } from "react";
+
+import { columns } from "./columns";
+import { Loader2 } from "lucide-react";
 
 interface ApiAgent {
   id: number;
@@ -15,58 +16,99 @@ interface ApiAgent {
   type: "agent";
   image?: string | null;
   canReceiveRemittanceList?: boolean;
+  address?: string | null;
+  city?: string | null;
+  country?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  nid_card_number?: string | null;
+  nid_card_front_pic_url?: string | null;
+  nid_card_back_pic_url?: string | null;
+  passport_file_url?: string | null;
+  qr_code?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  tcoin_balance?: string;
+  local_currency_balance?: string;
+  accepted_terms?: boolean;
+  birth_date?: string | null;
+  institution_name?: string | null;
 }
 
 export default function AgentsPage() {
-  const [agents, setAgents] = useState<Agent[]>([]);
+  const [agents, setAgents] = useState<ApiAgent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchAgents = async () => {
+  const fetchAgents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
       const userStr = localStorage.getItem("user");
       const token = localStorage.getItem("authToken");
 
       if (!userStr || !token) {
-        console.error("Missing credentials");
-        setLoading(false);
-        return;
+        throw new Error("Authentication required");
       }
 
-      try {
-        const currentUser = JSON.parse(userStr);
-        const response = await fetch(
-          `https://api.t-coin.code-studio4.com/api/admins/${currentUser.id}/agents`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-        if (data.success && data.data) {
-          const formattedAgents = data.data.map(
-            (agent: ApiAgent): Agent => ({
-              id: agent.id.toString(),
-              name: agent.full_name,
-              email: agent.email,
-              phone: agent.phone_no,
-              type: agent.type,
-              isApproved: agent.isApproved,
-              canReceiveRemittance: agent.canReceiveRemittanceList || false,
-            })
-          );
-          setAgents(formattedAgents);
+      const currentUser = JSON.parse(userStr);
+      const response = await fetch(
+        `https://api.t-coin.code-studio4.com/api/admins/${currentUser.id}/agents`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (error) {
-        console.error("Fetch error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      );
 
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch agents");
+      }
+
+      setAgents(data.data || []);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchAgents();
   }, []);
+
+  const formattedAgents = agents.map((agent) => ({
+    id: agent.id.toString(),
+    name: agent.full_name,
+    email: agent.email,
+    phone: agent.phone_no,
+    type: agent.type,
+    isApproved: agent.isApproved,
+    canReceiveRemittanceList: agent.canReceiveRemittanceList || false,
+    image: agent.image,
+    address: agent.address,
+    city: agent.city,
+    country: agent.country,
+    state: agent.state,
+    zip_code: agent.zip_code,
+    nid_card_number: agent.nid_card_number,
+    nid_card_front_pic_url: agent.nid_card_front_pic_url,
+    nid_card_back_pic_url: agent.nid_card_back_pic_url,
+    passport_file_url: agent.passport_file_url,
+    qr_code: agent.qr_code,
+    createdAt: agent.createdAt,
+    updatedAt: agent.updatedAt,
+    tcoin_balance: agent.tcoin_balance,
+    local_currency_balance: agent.local_currency_balance,
+    accepted_terms: agent.accepted_terms,
+    birth_date: agent.birth_date,
+    institution_name: agent.institution_name,
+  }));
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -76,12 +118,18 @@ export default function AgentsPage() {
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold tracking-tight">My Agents</h1>
             </div>
+
             {loading ? (
               <div className="flex items-center justify-center h-64">
-                <p>Loading agents...</p>
+                <Loader2 className="h-8 w-8 animate-spin" />
               </div>
+            ) : error ? (
+              <div className="text-red-500 p-4">{error}</div>
             ) : (
-              <DataTable columns={columns} data={agents} />
+              <DataTable
+                columns={columns(fetchAgents)}
+                data={formattedAgents}
+              />
             )}
           </div>
         </main>
