@@ -57,6 +57,7 @@ const baseMenuItems: MenuItem[] = [
       { name: "Remittance", href: "/transactions/remittance" },
       { name: "Send Money", href: "/transactions/send-money" },
       { name: "Cash Out", href: "/transactions/cash-out" },
+      { name: "T-coin Received", href: "/transactions/tcoin-receieved" },
     ],
   },
   { name: "Currency Rate", icon: TrendingUp, href: "/currency-rate" },
@@ -83,6 +84,11 @@ const baseMenuItems: MenuItem[] = [
     icon: MoreHorizontal,
     href: "/additional-charges",
   },
+  {
+    name: "Add TCoin",
+    icon: MoreHorizontal,
+    href: "/add-tcoin",
+  },
   // { name: "Notifications", icon: Bell, href: "/notifications" },
   // { name: "Investor List", icon: List, href: "/investors" },
   // { name: "Savings", icon: PiggyBank, href: "/savings" },
@@ -91,13 +97,14 @@ const baseMenuItems: MenuItem[] = [
 
 const adminItems: MenuItem[] = [
   { name: "Agent List", icon: Handshake, href: "/agents" },
-  { name: "Agent Money to Tcoin", icon: Users, href: "/agent-money-to-tcoin" },
-  { name: "Admin Tcoin to money", icon: Users, href: "/admin-tcoin-to-money" },
+  // { name: "Agent Money to Tcoin", icon: Users, href: "/agent-money-to-tcoin" },
+  // { name: "Admin Tcoin to money", icon: Users, href: "/admin-tcoin-to-money" },
 ];
 
 const superAdminItems: MenuItem[] = [
   { name: "Admin & Agent List", icon: Users, href: "/admins" },
-  { name: "Admin Money to Tcoin", icon: Users, href: "/admin-money-to-tcoin" },
+
+  // { name: "Admin Money to Tcoin", icon: Users, href: "/admin-money-to-tcoin" },
 ];
 
 const AppSidebar = () => {

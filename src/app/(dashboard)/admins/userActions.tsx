@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Eye } from "lucide-react";
+import {
+  Loader2,
+  Eye,
+  Trash,
+  MoreVertical,
+  ToggleLeft,
+  ToggleRight,
+  Check,
+  UserCog,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -10,83 +19,175 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Image from "next/image";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
+
+interface Admin {
+  id: string;
+  full_name: string;
+  email: string;
+  phone_no?: string;
+  isApproved?: boolean;
+  type?: "admin" | "agent";
+  canReceiveRemittanceList?: boolean;
+  image?: string | null;
+}
+
+interface ApiAdminResponse {
+  id: string;
+  full_name: string;
+  email: string;
+  phone_no?: string;
+  isApproved?: boolean;
+  type?: "admin" | "agent";
+  canReceiveRemittanceList?: boolean;
+  image?: string | null;
+}
+
+interface User {
+  id: string;
+  type: "admin" | "agent";
+  isApproved: boolean;
+  canReceiveRemittanceList?: boolean;
+  name: string;
+  email: string;
+  phone: string;
+  image?: string | null;
+  address?: string | null;
+  city?: string | null;
+  country?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  nid_card_number?: string | null;
+  nid_card_front_pic_url?: string | null;
+  nid_card_back_pic_url?: string | null;
+  passport_file_url?: string | null;
+  qr_code?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  tcoin_balance?: string;
+  local_currency_balance?: string;
+}
 
 export function UserActions({
   user,
   onActionComplete,
 }: {
-  user: {
-    id: string;
-    type: "admin" | "agent";
-    isApproved: boolean;
-    canReceiveRemittanceList?: boolean;
-    name: string;
-    email: string;
-    phone: string;
-    image?: string | null;
-    address?: string | null;
-    city?: string | null;
-    country?: string | null;
-    state?: string | null;
-    zip_code?: string | null;
-    nid_card_number?: string | null;
-    nid_card_front_pic_url?: string | null;
-    nid_card_back_pic_url?: string | null;
-    passport_file_url?: string | null;
-    qr_code?: string | null;
-    createdAt?: string;
-    updatedAt?: string;
-    tcoin_balance?: string;
-    local_currency_balance?: string;
-  };
+  user: User;
   onActionComplete?: () => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [actionType, setActionType] = useState<
-    "approve" | "delete" | "toggle"
-  >();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const handleAction = async (type: "approve" | "delete" | "toggle") => {
+  const [actionType, setActionType] = useState<
+    "approve" | "delete" | "toggle" | "assign"
+  >();
+  const [admins, setAdmins] = useState<Admin[]>([]);
+  const [selectedAdminId, setSelectedAdminId] = useState("");
+
+  const fetchAdmins = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("Authentication token not found");
+
+      const res = await fetch("https://api.t-coin.code-studio4.com/admins", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+
+      const json = await res.json();
+      const data = Array.isArray(json) ? json : json.data;
+
+      if (!Array.isArray(data)) throw new Error("Invalid data");
+
+      const formatted: Admin[] = data
+        .map((admin: ApiAdminResponse): Admin | null => {
+          try {
+            return {
+              id: admin.id.toString(),
+              full_name: admin.full_name || "Unnamed Admin",
+              email: admin.email || "no-email@example.com",
+            };
+          } catch {
+            return null;
+          }
+        })
+        .filter((a): a is Admin => !!a);
+
+      setAdmins(formatted);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch admins");
+      setAdmins([]);
+    }
+  };
+
+  const handleAction = async (
+    type: "approve" | "delete" | "toggle" | "assign"
+  ) => {
     setActionType(type);
     setIsLoading(true);
 
-    const userStr = localStorage.getItem("user");
-    const token = localStorage.getItem("authToken");
-    const adminType = localStorage.getItem("adminType");
-
-    if (!userStr || !token || !adminType) {
-      alert("Authorization error. Please log in again.");
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      const currentUser = JSON.parse(userStr);
+      const token = localStorage.getItem("authToken");
+      const userStr = localStorage.getItem("user");
+      const currentUser = userStr ? JSON.parse(userStr) : null;
+
+      if (!token || !currentUser?.id) {
+        throw new Error("Authorization error. Please log in again.");
+      }
+
       let endpoint = "";
       let method = "GET";
       let body = null;
 
-      if (type === "approve") {
-        endpoint = `https://api.t-coin.code-studio4.com/api/super-admin/${currentUser.id}/approve`;
-        method = "POST";
-        body = JSON.stringify({
-          approveUserId: parseInt(user.id),
-          type: user.type,
-          approveStatus: true,
-        });
-      } else if (type === "delete") {
-        endpoint =
-          user.type === "admin"
-            ? `https://api.t-coin.code-studio4.com/api/admins/${user.id}`
-            : `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
-        method = "DELETE";
-      } else if (type === "toggle") {
-        endpoint = `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
-        method = "PUT";
-        body = JSON.stringify({
-          canReceiveRemittanceList: !user.canReceiveRemittanceList,
-        });
+      switch (type) {
+        case "approve":
+          endpoint = `https://api.t-coin.code-studio4.com/api/super-admin/${currentUser.id}/approve`;
+          method = "POST";
+          body = JSON.stringify({
+            approveUserId: user.id,
+            type: user.type,
+            approveStatus: true,
+          });
+          break;
+        case "delete":
+          endpoint =
+            user.type === "admin"
+              ? `https://api.t-coin.code-studio4.com/api/admins/${user.id}`
+              : `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
+          method = "DELETE";
+          break;
+        case "toggle":
+          endpoint = `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
+          method = "PUT";
+          body = JSON.stringify({
+            canReceiveRemittanceList: !user.canReceiveRemittanceList,
+          });
+          break;
+        case "assign":
+          if (!selectedAdminId) throw new Error("Please select an admin");
+          endpoint = `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
+          method = "PUT";
+          body = JSON.stringify({
+            newAdminId: selectedAdminId,
+          });
+          break;
       }
 
       const response = await fetch(endpoint, {
@@ -98,25 +199,28 @@ export function UserActions({
         body,
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        alert(
-          type === "approve"
-            ? `${user.type.toUpperCase()} approved successfully`
-            : type === "delete"
-            ? `${user.type.toUpperCase()} deleted successfully`
-            : `Remittance ${
-                !user.canReceiveRemittanceList ? "enabled" : "disabled"
-              } successfully`
-        );
-        onActionComplete?.();
-      } else {
-        alert(data.message || "Action failed");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Action failed");
       }
+
+      toast.success(
+        type === "approve"
+          ? `${user.type.toUpperCase()} approved successfully`
+          : type === "delete"
+          ? `${user.type.toUpperCase()} deleted successfully`
+          : type === "toggle"
+          ? `Remittance ${
+              !user.canReceiveRemittanceList ? "enabled" : "disabled"
+            } successfully`
+          : "Admin assigned successfully"
+      );
+      onActionComplete?.();
     } catch (error) {
       console.error("Action error:", error);
-      alert("Something went wrong. Try again.");
+      toast.error(
+        error instanceof Error ? error.message : "Something went wrong"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +231,11 @@ export function UserActions({
       {/* View Details Button */}
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+          >
             <Eye className="h-4 w-4" />
           </Button>
         </DialogTrigger>
@@ -136,9 +244,9 @@ export function UserActions({
             <DialogTitle>User Details</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left Column */}
+            {/* Left Column - User Info */}
             <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 {user.image && (
                   <div className="relative h-24 w-24 min-w-[6rem]">
                     <Image
@@ -146,6 +254,7 @@ export function UserActions({
                       alt="User image"
                       fill
                       className="rounded-md object-cover"
+                      unoptimized
                     />
                   </div>
                 )}
@@ -186,7 +295,7 @@ export function UserActions({
               </div>
             </div>
 
-            {/* Right Column */}
+            {/* Right Column - Documents */}
             <div className="space-y-4">
               {user.qr_code && (
                 <ImageBlock title="QR Code" src={user.qr_code} />
@@ -208,26 +317,222 @@ export function UserActions({
         </DialogContent>
       </Dialog>
 
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-2">
-        <Button
-          size="sm"
-          variant="destructive"
-          className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
-          onClick={() => handleAction("delete")}
-          disabled={isLoading && actionType === "delete"}
-        >
-          {isLoading && actionType === "delete" ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            "Delete"
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 px-2"
+            title="More actions"
+          >
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          {/* Delete Action */}
+          <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+            <DialogTrigger asChild>
+              <DropdownMenuItem
+                onSelect={(e) => e.preventDefault()}
+                className="text-red-600 focus:text-red-600 focus:bg-red-50"
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                Delete User
+              </DropdownMenuItem>
+            </DialogTrigger>
+            <Dialog
+              open={showDeleteConfirm}
+              onOpenChange={setShowDeleteConfirm}
+            >
+              {/* <DialogTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </DialogTrigger> */}
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Confirm Deletion</DialogTitle>
+                </DialogHeader>
+                <p>
+                  Are you sure you want to delete <strong>{user.name}</strong>?
+                </p>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowDeleteConfirm(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      setShowDeleteConfirm(false);
+                      handleAction("delete");
+                    }}
+                    disabled={isLoading && actionType === "delete"}
+                  >
+                    {isLoading && actionType === "delete" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Delete"
+                    )}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </Dialog>
+
+          {/* Approve Action */}
+          {!user.isApproved && (
+            <DropdownMenuItem
+              onClick={() => handleAction("approve")}
+              disabled={isLoading && actionType === "approve"}
+            >
+              {isLoading && actionType === "approve" ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="mr-2 h-4 w-4" />
+              )}
+              Approve User
+            </DropdownMenuItem>
           )}
-        </Button>
+
+          {/* Agent-specific Actions */}
+          {user.type === "agent" && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => handleAction("toggle")}
+                disabled={isLoading && actionType === "toggle"}
+              >
+                {isLoading && actionType === "toggle" ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : user.canReceiveRemittanceList ? (
+                  <ToggleLeft className="mr-2 h-4 w-4" />
+                ) : (
+                  <ToggleRight className="mr-2 h-4 w-4" />
+                )}
+                {user.canReceiveRemittanceList
+                  ? "Disable Remittance"
+                  : "Enable Remittance"}
+              </DropdownMenuItem>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem
+                    onClick={fetchAdmins}
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <UserCog className="mr-2 h-4 w-4" />
+                    Assign Admin
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Assign Admin to Agent</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Assigning admin to: {user.name}
+                      </p>
+                      <Select
+                        value={selectedAdminId}
+                        onValueChange={setSelectedAdminId}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select an admin" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {admins.length > 0 ? (
+                            admins.map((admin) => (
+                              <SelectItem key={admin.id} value={admin.id}>
+                                {admin.full_name} ({admin.email})
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <div className="p-2 text-sm text-muted-foreground">
+                              No admins available
+                            </div>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button
+                      onClick={() => handleAction("assign")}
+                      disabled={
+                        isLoading || !selectedAdminId || admins.length === 0
+                      }
+                      className="w-full"
+                    >
+                      {isLoading && actionType === "assign" ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        "Assign Admin"
+                      )}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Action Buttons */}
+      {/* <div className="flex flex-wrap gap-2">
+        <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+          <DialogTrigger asChild>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => setShowDeleteConfirm(true)}
+              className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Deletion</DialogTitle>
+            </DialogHeader>
+            <p>
+              Are you sure you want to delete <strong>{user.name}</strong>?
+            </p>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  handleAction("delete");
+                }}
+                disabled={isLoading && actionType === "delete"}
+              >
+                {isLoading && actionType === "delete" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Delete"
+                )}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {!user.isApproved && (
           <Button
             size="sm"
-            className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+            className="bg-green-500 text-white hover:bg-green-600"
             onClick={() => handleAction("approve")}
             disabled={isLoading && actionType === "approve"}
           >
@@ -260,12 +565,72 @@ export function UserActions({
             )}
           </Button>
         )}
-      </div>
+
+        {user.type === "agent" && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                size="sm"
+                variant="outline"
+                className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+                onClick={fetchAdmins}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Assign Admin
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Assign Admin to Agent</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Assigning admin to: {user.name}
+                  </p>
+                  <Select
+                    value={selectedAdminId}
+                    onValueChange={setSelectedAdminId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an admin" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {admins.length > 0 ? (
+                        admins.map((admin) => (
+                          <SelectItem key={admin.id} value={admin.id}>
+                            {admin.full_name} ({admin.email})
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-2 text-sm text-muted-foreground">
+                          No admins available
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  onClick={() => handleAction("assign")}
+                  disabled={
+                    isLoading || !selectedAdminId || admins.length === 0
+                  }
+                  className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+                >
+                  {isLoading && actionType === "assign" ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Assign Admin"
+                  )}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div> */}
     </div>
   );
 }
-
-// 🔧 Helper components for cleaner UI
 
 function InfoRow({ label, value }: { label: string; value?: string | null }) {
   return (
@@ -286,6 +651,7 @@ function ImageBlock({ title, src }: { title: string; src: string }) {
           alt={title}
           fill
           className="rounded-md object-contain"
+          unoptimized
         />
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { TransactionsTable } from "../_components/transaction-table";
 
-export default function CashOutPage() {
+export default function SendMoneyPage() {
   return (
     <div className="flex min-h-screen w-full flex-col">
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
@@ -8,10 +8,10 @@ export default function CashOutPage() {
           <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold tracking-tight">
-                Send Money Transactions
+                T-coin Receieved Transactions
               </h1>
             </div>
-            <TransactionsTable type="Cash Out" />
+            <TransactionsTable type="T-coin Received" />
           </div>
         </main>
       </div>

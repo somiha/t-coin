@@ -121,6 +121,12 @@ export function TransactionsTable({
           account_number: item.account_number || "N/A",
           account_holder_mobile_number:
             item.account_holder_mobile_number || "N/A",
+          sender_name: item.sender_name || "N/A",
+          receiver_name: item.receiver_name || "N/A",
+          sender_image_url: item.sender_image_url || "/person-fill.png",
+          receiver_image_url: item.receiver_image_url || "/person-fill.png",
+          transaction_type: item.transaction_type || "N/A",
+          local_currency_amount: item.local_currency_amount || "N/A",
         }));
 
         setTransactions(transformedData);

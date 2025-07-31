@@ -56,6 +56,7 @@ export function DataTable<TData, TValue>({
           <Search className="absolute p-1 h-6 w-6 text-gray-400 left-2 top-2" />
         </div> */}
       </div>
+
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>

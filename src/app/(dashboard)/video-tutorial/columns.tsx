@@ -19,7 +19,7 @@ export type Video = {
   id: string;
   title: string;
   description: string;
-  video: string;
+  videoUrl: string;
   thumbnail: string;
 };
 
@@ -32,10 +32,19 @@ export const columns: ColumnDef<Video>[] = [
     id: "video",
     header: "Video",
     cell: ({ row }) => (
-      <video width="160" height="90" controls>
-        <source src={row.original.video} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
+      <div className="relative w-[200px] h-[100px] bg-gray-100">
+        <video
+          width="200"
+          height="100"
+          controls
+          playsInline
+          className="object-cover w-full h-full"
+          crossOrigin="anonymous"
+        >
+          <source src={row.original.videoUrl} type="video/mp4" />
+          Your browser doesnot support HTML5 video.
+        </video>
+      </div>
     ),
   },
   {
@@ -59,6 +68,30 @@ export const columns: ColumnDef<Video>[] = [
   {
     accessorKey: "description",
     header: "Description",
+    cell: ({ row }) => {
+      const description = row.original.description || "";
+      const maxLength = 50;
+
+      return (
+        <details className="group max-w-[250px]">
+          <summary className="flex items-center gap-2 cursor-pointer list-none">
+            <span className="truncate group-open:hidden">
+              {description.length > maxLength
+                ? `${description.substring(0, maxLength)}...`
+                : description}
+            </span>
+            <span className="hidden group-open:block whitespace-pre-wrap">
+              {description}
+            </span>
+            {description.length > maxLength && (
+              <Button asChild size="icon" variant={"ghost"}>
+                <span className="group-open:hidden">See More</span>
+              </Button>
+            )}
+          </summary>
+        </details>
+      );
+    },
   },
   {
     id: "actions",

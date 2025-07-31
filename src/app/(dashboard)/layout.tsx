@@ -53,9 +53,9 @@ export default function DashboardLayout({
   return (
     <SidebarProviderWrapper>
       <AppSidebar />
-      <main className="w-full">
+      <main className="w-full overflow-x-hidden">
         <Navbar />
-        <div className="px-4">{children}</div>
+        <div className="px-4 overflow-x-auto">{children}</div>
       </main>
     </SidebarProviderWrapper>
   );

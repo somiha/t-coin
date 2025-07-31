@@ -34,6 +34,16 @@ interface ApiUser {
   accepted_terms?: boolean;
   birth_date?: string | null;
   institution_name?: string | null;
+  admin?: {
+    id: number;
+    name: string;
+    type: string;
+    email: string;
+    image: string;
+    phone_no: string;
+    country: string;
+    approve_status: boolean;
+  } | null;
 }
 
 interface ApiResponse {
@@ -110,6 +120,16 @@ export default function Page() {
           accepted_terms: u.accepted_terms,
           birth_date: u.birth_date,
           institution_name: u.institution_name,
+          admin: {
+            id: u.admin?.id || 0,
+            name: u.admin?.name || "",
+            type: u.admin?.type || "",
+            email: u.admin?.email || "",
+            image: u.admin?.image || "",
+            phone_no: u.admin?.phone_no || "",
+            country: u.admin?.country || "",
+            approve_status: u.admin?.approve_status || false,
+          },
         })),
         ...(data.data.agents || []).map((u: ApiUser) => ({
           id: u.id.toString(),
@@ -137,6 +157,16 @@ export default function Page() {
           accepted_terms: u.accepted_terms,
           birth_date: u.birth_date,
           institution_name: u.institution_name,
+          admin: {
+            id: u.admin?.id || 0,
+            name: u.admin?.name || "",
+            type: u.admin?.type || "",
+            email: u.admin?.email || "",
+            image: u.admin?.image || "",
+            phone_no: u.admin?.phone_no || "",
+            country: u.admin?.country || "",
+            approve_status: u.admin?.approve_status || false,
+          },
         })),
       ];
       setUsers(allUsers);
@@ -156,7 +186,7 @@ export default function Page() {
   const filteredUsers = users.filter((user) => user.type === activeTab);
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+    <div className="flex min-h-screen w-full flex-col">
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
           <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">

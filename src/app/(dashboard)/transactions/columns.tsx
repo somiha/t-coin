@@ -32,6 +32,12 @@ export type Transaction = {
   account_holder_name?: string;
   account_number?: string;
   account_holder_mobile_number?: string;
+  sender_name?: string;
+  receiver_name?: string;
+  sender_image_url?: string;
+  receiver_image_url?: string;
+  transaction_type?: string;
+  local_currency_amount?: string;
 };
 
 export const columns: ColumnDef<Transaction>[] = [
@@ -112,83 +118,194 @@ function ViewTransactionModal({ transaction }: { transaction: Transaction }) {
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-md text-transparent bg-clip-text bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] p-3 rounded-md mb-4">
-              {transaction.name}
+        <DialogContent className="fixed max-h-[90vh] w-[800px] max-w-[90vw] overflow-y-auto">
+          <DialogHeader className="sticky top-0 bg-white z-10 pt-2 pb-4">
+            <DialogTitle className="text-md text-transparent bg-clip-text bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))]">
+              Transaction Details
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 text-sm">
-            <p>
-              <strong>Method:</strong> {transaction.method}
-            </p>
-            <p>
-              <strong>Type:</strong> {transaction.type}
-            </p>
-            <p>
-              <strong>Amount:</strong> {transaction.amount}
-            </p>
-            <p>
-              <strong>Charge:</strong> {transaction.charge}
-            </p>
-            <p>
-              <strong>Date:</strong>{" "}
-              {transaction.date && !isNaN(new Date(transaction.date).getTime())
-                ? format(new Date(transaction.date), "yyyy-MM-dd HH:mm")
-                : "Invalid Date"}
-            </p>
-            {transaction.transaction_status && (
-              <p>
-                <strong>Status:</strong> {transaction.transaction_status}
-              </p>
+          <div className="space-y-6 pb-4">
+            {/* Transaction Overview */}
+            <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div>
+                <h3 className="font-medium text-gray-500">Transaction ID</h3>
+                <p className="mt-1">{transaction.id}</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-500">Status</h3>
+                <p className="mt-1 capitalize">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      transaction.transaction_status === "Pending"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : transaction.transaction_status === "Completed"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {transaction.transaction_status}
+                  </span>
+                </p>
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-500">Date</h3>
+                <p className="mt-1">
+                  {transaction.date &&
+                  !isNaN(new Date(transaction.date).getTime())
+                    ? format(new Date(transaction.date), "yyyy-MM-dd HH:mm")
+                    : "Invalid Date"}
+                </p>
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-500">Transaction Type</h3>
+                <p className="mt-1">
+                  {transaction.transaction_type || transaction.type}
+                </p>
+              </div>
+            </div>
+
+            {/* Parties Involved */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-4 border rounded-lg">
+                <h3 className="font-medium text-lg mb-3">Sender Information</h3>
+                <div className="flex items-start space-x-4">
+                  {transaction.sender_image_url && (
+                    <div className="w-12 h-12 relative rounded-full overflow-hidden">
+                      <Image
+                        src={transaction.sender_image_url}
+                        alt={transaction.sender_name || "Sender"}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-medium">
+                      {transaction.sender_name || "N/A"}
+                    </p>
+                    {transaction.sender_nid && (
+                      <p className="text-sm text-gray-500">
+                        NID: {transaction.sender_nid}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 border rounded-lg">
+                <h3 className="font-medium text-lg mb-3">
+                  Receiver Information
+                </h3>
+                <div className="flex items-start space-x-4">
+                  {transaction.receiver_image_url && (
+                    <div className="w-12 h-12 relative rounded-full overflow-hidden">
+                      <Image
+                        src={transaction.receiver_image_url}
+                        alt={transaction.receiver_name || "Receiver"}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-medium">
+                      {transaction.receiver_name || "N/A"}
+                    </p>
+                    {transaction.receiver_nid && (
+                      <p className="text-sm text-gray-500">
+                        NID: {transaction.receiver_nid}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Transaction Details */}
+            <div className="p-4 border rounded-lg">
+              <h3 className="font-medium text-lg mb-3">Transaction Details</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-medium text-gray-500">Amount</h3>
+                  <p className="mt-1">{transaction.amount} T-Coin</p>
+                </div>
+                {transaction.local_currency_amount && (
+                  <div>
+                    <h3 className="font-medium text-gray-500">Local Amount</h3>
+                    <p className="mt-1">৳{transaction.local_currency_amount}</p>
+                  </div>
+                )}
+                {transaction.charge && (
+                  <div>
+                    <h3 className="font-medium text-gray-500">Charge</h3>
+                    <p className="mt-1">{transaction.charge}</p>
+                  </div>
+                )}
+                {transaction.method_label && (
+                  <div>
+                    <h3 className="font-medium text-gray-500">Method</h3>
+                    <p className="mt-1">{transaction.method_label}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Bank Details (if available) */}
+            {(transaction.bank_name || transaction.account_number) && (
+              <div className="p-4 border rounded-lg">
+                <h3 className="font-medium text-lg mb-3">Bank Details</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {transaction.bank_name && (
+                    <div>
+                      <h3 className="font-medium text-gray-500">Bank Name</h3>
+                      <p className="mt-1">{transaction.bank_name}</p>
+                    </div>
+                  )}
+                  {transaction.bank_branch_name && (
+                    <div>
+                      <h3 className="font-medium text-gray-500">Branch Name</h3>
+                      <p className="mt-1">{transaction.bank_branch_name}</p>
+                    </div>
+                  )}
+                  {transaction.account_holder_name && (
+                    <div>
+                      <h3 className="font-medium text-gray-500">
+                        Account Holder
+                      </h3>
+                      <p className="mt-1">{transaction.account_holder_name}</p>
+                    </div>
+                  )}
+                  {transaction.account_number && (
+                    <div>
+                      <h3 className="font-medium text-gray-500">
+                        Account Number
+                      </h3>
+                      <p className="mt-1">{transaction.account_number}</p>
+                    </div>
+                  )}
+                  {transaction.account_holder_mobile_number && (
+                    <div>
+                      <h3 className="font-medium text-gray-500">
+                        Mobile Number
+                      </h3>
+                      <p className="mt-1">
+                        {transaction.account_holder_mobile_number}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
+
+            {/* Description */}
             {transaction.description && (
-              <p>
-                <strong>Description:</strong> {transaction.description}
-              </p>
-            )}
-            {transaction.receiver_nid && (
-              <p>
-                <strong>Receiver NID:</strong> {transaction.receiver_nid}
-              </p>
-            )}
-            {transaction.sender_nid && (
-              <p>
-                <strong>Sender NID:</strong> {transaction.sender_nid}
-              </p>
-            )}
-            {transaction.method_label && (
-              <p>
-                <strong>Method Label:</strong> {transaction.method_label}
-              </p>
-            )}
-            {transaction.bank_name && (
-              <p>
-                <strong>Bank Name:</strong> {transaction.bank_name}
-              </p>
-            )}
-            {transaction.bank_branch_name && (
-              <p>
-                <strong>Bank Branch:</strong> {transaction.bank_branch_name}
-              </p>
-            )}
-            {transaction.account_holder_name && (
-              <p>
-                <strong>Account Holder:</strong>{" "}
-                {transaction.account_holder_name}
-              </p>
-            )}
-            {transaction.account_number && (
-              <p>
-                <strong>Account Number:</strong> {transaction.account_number}
-              </p>
-            )}
-            {transaction.account_holder_mobile_number && (
-              <p>
-                <strong>Account Mobile:</strong>{" "}
-                {transaction.account_holder_mobile_number}
-              </p>
+              <div className="p-4 border rounded-lg">
+                <h3 className="font-medium text-lg mb-3">Description</h3>
+                <p className="text-gray-700 whitespace-pre-line">
+                  {transaction.description}
+                </p>
+              </div>
             )}
           </div>
         </DialogContent>

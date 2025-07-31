@@ -31,6 +31,16 @@ export type User = {
   accepted_terms?: boolean;
   birth_date?: string | null;
   institution_name?: string | null;
+  admin?: {
+    id: number;
+    name: string;
+    type: string;
+    email: string;
+    image: string;
+    phone_no: string;
+    country: string;
+    approve_status: boolean;
+  } | null;
 };
 
 export const columns: ColumnDef<User>[] = [
@@ -86,6 +96,21 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "phone",
     header: "Phone",
+  },
+  {
+    id: "admin",
+    header: "Admin",
+    cell: ({ row }) => (
+      <div>
+        {row.original.type === "agent" && row.original.admin ? (
+          <div className="flex items-center gap-2">
+            <span>{row.original.admin.name}</span>
+          </div>
+        ) : (
+          <span className="text-gray-400">N/A</span>
+        )}
+      </div>
+    ),
   },
   {
     accessorKey: "isApproved",
