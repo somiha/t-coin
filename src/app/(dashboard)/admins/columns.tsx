@@ -43,6 +43,12 @@ export type User = {
   } | null;
 };
 
+interface TableMeta {
+  updateUser?: (userId: string, updates: Partial<User>) => void;
+  deleteUser?: (userId: string) => void;
+  refetchData?: () => void;
+}
+
 export const columns: ColumnDef<User>[] = [
   {
     id: "select",
@@ -146,6 +152,19 @@ export const columns: ColumnDef<User>[] = [
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row }) => <UserActions user={row.original} />,
+    cell: ({ row, table }) => {
+      const meta = table.options.meta as TableMeta | undefined;
+
+      return (
+        <UserActions
+          user={row.original}
+          onUserUpdate={(updates) =>
+            meta?.updateUser?.(row.original.id, updates)
+          }
+          onUserDelete={(userId) => meta?.deleteUser?.(userId)}
+          onActionComplete={() => meta?.refetchData?.()}
+        />
+      );
+    },
   },
 ];

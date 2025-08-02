@@ -57,7 +57,12 @@ interface ApiAdminResponse {
   canReceiveRemittanceList?: boolean;
   image?: string | null;
 }
-
+interface UserActionsProps {
+  user: User;
+  onActionComplete?: () => void;
+  onUserUpdate?: (updates: Partial<User>) => void;
+  onUserDelete?: (userId: string) => void;
+}
 interface User {
   id: string;
   type: "admin" | "agent";
@@ -86,10 +91,9 @@ interface User {
 export function UserActions({
   user,
   onActionComplete,
-}: {
-  user: User;
-  onActionComplete?: () => void;
-}) {
+  onUserUpdate,
+  onUserDelete,
+}: UserActionsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -136,6 +140,95 @@ export function UserActions({
       setAdmins([]);
     }
   };
+
+  //   const handleAction = async (
+  //     type: "approve" | "delete" | "toggle" | "assign"
+  //   ) => {
+  //     setActionType(type);
+  //     setIsLoading(true);
+
+  //     try {
+  //       const token = localStorage.getItem("authToken");
+  //       const userStr = localStorage.getItem("user");
+  //       const currentUser = userStr ? JSON.parse(userStr) : null;
+
+  //       if (!token || !currentUser?.id) {
+  //         throw new Error("Authorization error. Please log in again.");
+  //       }
+
+  //       let endpoint = "";
+  //       let method = "GET";
+  //       let body = null;
+
+  //       switch (type) {
+  //         case "approve":
+  //           endpoint = `https://api.t-coin.code-studio4.com/api/super-admin/${currentUser.id}/approve`;
+  //           method = "POST";
+  //           body = JSON.stringify({
+  //             approveUserId: user.id,
+  //             type: user.type,
+  //             approveStatus: true,
+  //           });
+  //           break;
+  //         case "delete":
+  //           endpoint =
+  //             user.type === "admin"
+  //               ? `https://api.t-coin.code-studio4.com/api/admins/${user.id}`
+  //               : `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
+  //           method = "DELETE";
+  //           break;
+  //         case "toggle":
+  //           endpoint = `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
+  //           method = "PUT";
+  //           body = JSON.stringify({
+  //             canReceiveRemittanceList: !user.canReceiveRemittanceList,
+  //           });
+  //           break;
+  //         case "assign":
+  //           if (!selectedAdminId) throw new Error("Please select an admin");
+  //           endpoint = `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
+  //           method = "PUT";
+  //           body = JSON.stringify({
+  //             newAdminId: selectedAdminId,
+  //           });
+  //           break;
+  //       }
+
+  //       const response = await fetch(endpoint, {
+  //         method,
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //         body,
+  //       });
+
+  //       if (!response.ok) {
+  //         const errorData = await response.json().catch(() => ({}));
+  //         throw new Error(errorData.message || "Action failed");
+  //       }
+
+  //       toast.success(
+  //         type === "approve"
+  //           ? `${user.type.toUpperCase()} approved successfully`
+  //           : type === "delete"
+  //           ? `${user.type.toUpperCase()} deleted successfully`
+  //           : type === "toggle"
+  //           ? `Remittance ${
+  //               !user.canReceiveRemittanceList ? "enabled" : "disabled"
+  //             } successfully`
+  //           : "Admin assigned successfully"
+  //       );
+  //       onActionComplete?.();
+  //     } catch (error) {
+  //       console.error("Action error:", error);
+  //       toast.error(
+  //         error instanceof Error ? error.message : "Something went wrong"
+  //       );
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
   const handleAction = async (
     type: "approve" | "delete" | "toggle" | "assign"
@@ -204,6 +297,24 @@ export function UserActions({
         throw new Error(errorData.message || "Action failed");
       }
 
+      // Call the appropriate callback after successful action
+      switch (type) {
+        case "approve":
+          onUserUpdate?.({ isApproved: true });
+          break;
+        case "delete":
+          onUserDelete?.(user.id);
+          break;
+        case "toggle":
+          onUserUpdate?.({
+            canReceiveRemittanceList: !user.canReceiveRemittanceList,
+          });
+          break;
+        case "assign":
+          // Handle admin assignment updates if needed
+          break;
+      }
+
       toast.success(
         type === "approve"
           ? `${user.type.toUpperCase()} approved successfully`
@@ -225,7 +336,6 @@ export function UserActions({
       setIsLoading(false);
     }
   };
-
   return (
     <div className="flex flex-wrap items-center gap-2">
       {/* View Details Button */}

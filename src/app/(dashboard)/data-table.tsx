@@ -30,15 +30,23 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   loading?: boolean;
   error?: string | null;
+  onActionComplete?: () => void;
+  meta?: {
+    updateUser?: (userId: string, updates: Partial<TData>) => void;
+    deleteUser?: (userId: string) => void;
+    refetchData?: () => void;
+  };
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  meta,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
+    meta,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {

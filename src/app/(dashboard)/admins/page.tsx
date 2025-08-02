@@ -179,6 +179,19 @@ export default function Page() {
     }
   };
 
+  const updateUser = (userId: string, updates: Partial<User>) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.id === userId ? { ...user, ...updates } : user
+      )
+    );
+  };
+
+  // Properly type the delete function
+  const deleteUser = (userId: string) => {
+    setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -233,7 +246,15 @@ export default function Page() {
                 ) : error ? (
                   <div className="text-red-500 p-4">{error}</div>
                 ) : (
-                  <DataTable columns={columns} data={filteredUsers} />
+                  <DataTable
+                    columns={columns}
+                    data={filteredUsers}
+                    meta={{
+                      updateUser,
+                      deleteUser,
+                      refetchData: fetchUsers, // Optional: if you want to support refreshing
+                    }}
+                  />
                 )}
               </TabsContent>
             </Tabs>
