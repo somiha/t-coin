@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 
 import { columns } from "./columns";
 import { Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 interface ApiAgent {
   id: number;
@@ -39,6 +41,7 @@ export default function AgentsPage() {
   const [agents, setAgents] = useState<ApiAgent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchAgents = async () => {
     try {
@@ -109,6 +112,24 @@ export default function AgentsPage() {
     birth_date: agent.birth_date,
     institution_name: agent.institution_name,
   }));
+  const filteredAgents = formattedAgents.filter((agent) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      agent.name?.toLowerCase().includes(query) ||
+      agent.email?.toLowerCase().includes(query) ||
+      agent.phone?.toLowerCase().includes(query) ||
+      agent.country?.toLowerCase().includes(query) ||
+      agent.city?.toLowerCase().includes(query) ||
+      agent.state?.toLowerCase().includes(query) ||
+      agent.address?.toLowerCase().includes(query) ||
+      agent.zip_code?.toLowerCase().includes(query) ||
+      agent.birth_date?.toLowerCase().includes(query) ||
+      agent.institution_name?.toLowerCase().includes(query) ||
+      agent.qr_code?.toLowerCase().includes(query) ||
+      agent.nid_card_number?.toLowerCase().includes(query) ||
+      agent.passport_file_url?.toLowerCase().includes(query)
+    );
+  });
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -118,6 +139,18 @@ export default function AgentsPage() {
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold tracking-tight">My Agents</h1>
             </div>
+            <div className="mb-4">
+              <div className="mb-4 relative">
+                <Input
+                  placeholder="Search Agent"
+                  className="max-w-sm pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+
+                <Search className="absolute p-1 h-6 w-6 text-gray-400 left-2 top-2" />
+              </div>
+            </div>
 
             {loading ? (
               <div className="flex items-center justify-center h-64">
@@ -126,10 +159,11 @@ export default function AgentsPage() {
             ) : error ? (
               <div className="text-red-500 p-4">{error}</div>
             ) : (
-              <DataTable
-                columns={columns(fetchAgents)}
-                data={formattedAgents}
-              />
+              // <DataTable
+              //   columns={columns(fetchAgents)}
+              //   data={formattedAgents}
+              // />
+              <DataTable columns={columns(fetchAgents)} data={filteredAgents} />
             )}
           </div>
         </main>

@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 interface ApiUser {
   id: number;
@@ -59,6 +61,7 @@ export default function Page() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchUsers = async () => {
     try {
@@ -196,7 +199,27 @@ export default function Page() {
     fetchUsers();
   }, []);
 
-  const filteredUsers = users.filter((user) => user.type === activeTab);
+  // const filteredUsers = users.filter((user) => user.type === activeTab);
+
+  const filteredUsers = users
+    .filter((user) => user.type === activeTab)
+    .filter((user) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        user.name?.toLowerCase().includes(query) ||
+        user.email?.toLowerCase().includes(query) ||
+        user.phone?.toLowerCase().includes(query) ||
+        user.country?.toLowerCase().includes(query) ||
+        user.state?.toLowerCase().includes(query) ||
+        user.city?.toLowerCase().includes(query) ||
+        user.zip_code?.toLowerCase().includes(query) ||
+        user.birth_date?.toLowerCase().includes(query) ||
+        user.address?.toLowerCase().includes(query) ||
+        user.institution_name?.toLowerCase().includes(query) ||
+        user.qr_code?.toLowerCase().includes(query) ||
+        user.nid_card_number?.toLowerCase().includes(query)
+      );
+    });
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -212,6 +235,19 @@ export default function Page() {
                   + Add Admin
                 </Button>
               </Link>
+            </div>
+
+            <div className="mb-4">
+              <div className="mb-4 relative">
+                <Input
+                  placeholder="Search Admin or Agent by name, phone, email, etc."
+                  className="max-w-sm pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+
+                <Search className="absolute p-1 h-6 w-6 text-gray-400 left-2 top-2" />
+              </div>
             </div>
 
             <Tabs
