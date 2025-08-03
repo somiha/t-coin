@@ -131,7 +131,7 @@ export const columns: ColumnDef<Investment>[] = [
 
         try {
           const res = await fetch(
-            `https://api.t-coin.code-studio4.com/api/investment-projects/${investmentId}`,
+            `https://api.backend.t-coin.saveneed.com/api/investment-projects/${investmentId}`,
             {
               method: "DELETE",
               headers: {

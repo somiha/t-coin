@@ -73,7 +73,7 @@ export default function Campaign() {
 
   const fetchCampaigns = () => {
     setLoading(true);
-    fetch("https://api.t-coin.code-studio4.com/api/campaign")
+    fetch("https://api.backend.t-coin.saveneed.com/api/campaign")
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.data)) {
@@ -115,7 +115,7 @@ export default function Campaign() {
       );
 
       const response = await fetch(
-        `https://api.t-coin.code-studio4.com/api/campaign/${editingCampaign.id}`,
+        `https://api.backend.t-coin.saveneed.com/api/campaign/${editingCampaign.id}`,
         {
           method: "PUT",
           body: formData,

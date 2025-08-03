@@ -73,7 +73,7 @@ export default function AddInvestment() {
     setLoading(true);
     try {
       const res = await fetch(
-        "https://api.t-coin.code-studio4.com/api/investment-projects",
+        "https://api.backend.t-coin.saveneed.com/api/investment-projects",
         {
           method: "POST",
           headers: {

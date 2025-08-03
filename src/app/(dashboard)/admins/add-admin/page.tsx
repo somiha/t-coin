@@ -52,7 +52,7 @@ export default function AddAdminPage() {
     const fetchTerms = async () => {
       try {
         const response = await fetch(
-          "https://api.t-coin.code-studio4.com/api/terms-and-conditions"
+          "https://api.backend.t-coin.saveneed.com/api/terms-and-conditions"
         );
 
         if (!response.ok) {
@@ -141,7 +141,7 @@ export default function AddAdminPage() {
 
       // Create the admin
       const createResponse = await fetch(
-        "https://api.t-coin.code-studio4.com/api/admins/with-multiple-files",
+        "https://api.backend.t-coin.saveneed.com/api/admins/with-multiple-files",
         {
           method: "POST",
           headers: {
@@ -161,7 +161,7 @@ export default function AddAdminPage() {
       const adminId = createData.data.id;
 
       const approveResponse = await fetch(
-        `https://api.t-coin.code-studio4.com/api/super-admin/${currentUser.id}/approve`,
+        `https://api.backend.t-coin.saveneed.com/api/super-admin/${currentUser.id}/approve`,
         {
           method: "POST",
           headers: {

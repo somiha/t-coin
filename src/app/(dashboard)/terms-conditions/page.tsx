@@ -38,7 +38,7 @@ export default function TermsAndConditionsPage() {
       }
 
       const response = await fetch(
-        "https://api.t-coin.code-studio4.com/api/terms-and-conditions",
+        "https://api.backend.t-coin.saveneed.com/api/terms-and-conditions",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -85,7 +85,7 @@ export default function TermsAndConditionsPage() {
       }
 
       const response = await fetch(
-        "https://api.t-coin.code-studio4.com/api/terms-and-conditions",
+        "https://api.backend.t-coin.saveneed.com/api/terms-and-conditions",
         {
           method: "POST",
           headers: {

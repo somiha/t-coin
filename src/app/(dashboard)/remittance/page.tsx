@@ -61,7 +61,7 @@ export default function RemittancePage() {
     }
 
     fetch(
-      "https://api.t-coin.code-studio4.com/api/transaction-history/remittance",
+      "https://api.backend.t-coin.saveneed.com/api/transaction-history/remittance",
       {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -20,8 +20,8 @@ export default function ForgotPasswordPage() {
 
   const getBaseUrl = () => {
     return isSuperAdmin
-      ? "https://api.t-coin.code-studio4.com/api/super-admin"
-      : "https://api.t-coin.code-studio4.com/api/admins";
+      ? "https://api.backend.t-coin.saveneed.com/api/super-admin"
+      : "https://api.backend.t-coin.saveneed.com/api/admins";
   };
 
   const handleSendOTP = async () => {

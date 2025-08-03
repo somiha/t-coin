@@ -12,7 +12,7 @@ export default function ParticipantPage() {
   useEffect(() => {
     const campaignId = "1"; // replace with dynamic ID if needed
     fetch(
-      `https://api.t-coin.code-studio4.com/api/campaign/${campaignId}/results`
+      `https://api.backend.t-coin.saveneed.com/api/campaign/${campaignId}/results`
     )
       .then((res) => res.json())
       .then((data) => {

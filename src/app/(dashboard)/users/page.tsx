@@ -64,7 +64,7 @@ export default function UsersPage() {
       return;
     }
 
-    fetch("https://api.t-coin.code-studio4.com/api/users", {
+    fetch("https://api.backend.t-coin.saveneed.com/api/users", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -117,7 +117,7 @@ export default function UsersPage() {
       }
 
       const response = await fetch(
-        `https://api.t-coin.code-studio4.com/api/notifications/broadcast`,
+        `https://api.backend.t-coin.saveneed.com/api/notifications/broadcast`,
         {
           method: "POST",
           headers: {

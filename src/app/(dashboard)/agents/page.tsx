@@ -57,7 +57,7 @@ export default function AgentsPage() {
 
       const currentUser = JSON.parse(userStr);
       const response = await fetch(
-        `https://api.t-coin.code-studio4.com/api/admins/${currentUser.id}/agents`,
+        `https://api.backend.t-coin.saveneed.com/api/admins/${currentUser.id}/agents`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

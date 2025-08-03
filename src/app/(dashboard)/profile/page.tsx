@@ -124,8 +124,8 @@ export default function ProfilePage() {
 
       const endpoint =
         adminType === "super_admin"
-          ? `https://api.t-coin.code-studio4.com/api/super-admin/${userId}`
-          : `https://api.t-coin.code-studio4.com/api/admins/${userId}`;
+          ? `https://api.backend.t-coin.saveneed.com/api/super-admin/${userId}`
+          : `https://api.backend.t-coin.saveneed.com/api/admins/${userId}`;
 
       const formData = new FormData();
       for (const [key, value] of Object.entries(profileData)) {

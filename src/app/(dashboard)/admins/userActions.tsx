@@ -108,9 +108,12 @@ export function UserActions({
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("Authentication token not found");
 
-      const res = await fetch("https://api.t-coin.code-studio4.com/admins", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        "https://api.backend.t-coin.saveneed.com/admins",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (!res.ok) throw new Error(`Error ${res.status}`);
 
@@ -162,7 +165,7 @@ export function UserActions({
 
   //       switch (type) {
   //         case "approve":
-  //           endpoint = `https://api.t-coin.code-studio4.com/api/super-admin/${currentUser.id}/approve`;
+  //           endpoint = `https://api.backend.t-coin.saveneed.com/api/super-admin/${currentUser.id}/approve`;
   //           method = "POST";
   //           body = JSON.stringify({
   //             approveUserId: user.id,
@@ -173,12 +176,12 @@ export function UserActions({
   //         case "delete":
   //           endpoint =
   //             user.type === "admin"
-  //               ? `https://api.t-coin.code-studio4.com/api/admins/${user.id}`
-  //               : `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
+  //               ? `https://api.backend.t-coin.saveneed.com/api/admins/${user.id}`
+  //               : `https://api.backend.t-coin.saveneed.com/api/agents/${user.id}`;
   //           method = "DELETE";
   //           break;
   //         case "toggle":
-  //           endpoint = `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
+  //           endpoint = `https://api.backend.t-coin.saveneed.com/api/agents/${user.id}`;
   //           method = "PUT";
   //           body = JSON.stringify({
   //             canReceiveRemittanceList: !user.canReceiveRemittanceList,
@@ -186,7 +189,7 @@ export function UserActions({
   //           break;
   //         case "assign":
   //           if (!selectedAdminId) throw new Error("Please select an admin");
-  //           endpoint = `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
+  //           endpoint = `https://api.backend.t-coin.saveneed.com/api/agents/${user.id}`;
   //           method = "PUT";
   //           body = JSON.stringify({
   //             newAdminId: selectedAdminId,
@@ -251,7 +254,7 @@ export function UserActions({
 
       switch (type) {
         case "approve":
-          endpoint = `https://api.t-coin.code-studio4.com/api/super-admin/${currentUser.id}/approve`;
+          endpoint = `https://api.backend.t-coin.saveneed.com/api/super-admin/${currentUser.id}/approve`;
           method = "POST";
           body = JSON.stringify({
             approveUserId: user.id,
@@ -262,12 +265,12 @@ export function UserActions({
         case "delete":
           endpoint =
             user.type === "admin"
-              ? `https://api.t-coin.code-studio4.com/api/admins/${user.id}`
-              : `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
+              ? `https://api.backend.t-coin.saveneed.com/api/admins/${user.id}`
+              : `https://api.backend.t-coin.saveneed.com/api/agents/${user.id}`;
           method = "DELETE";
           break;
         case "toggle":
-          endpoint = `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
+          endpoint = `https://api.backend.t-coin.saveneed.com/api/agents/${user.id}`;
           method = "PUT";
           body = JSON.stringify({
             canReceiveRemittanceList: !user.canReceiveRemittanceList,
@@ -275,7 +278,7 @@ export function UserActions({
           break;
         case "assign":
           if (!selectedAdminId) throw new Error("Please select an admin");
-          endpoint = `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
+          endpoint = `https://api.backend.t-coin.saveneed.com/api/agents/${user.id}`;
           method = "PUT";
           body = JSON.stringify({
             newAdminId: selectedAdminId,

@@ -73,7 +73,7 @@ export function TransactionsPage({
         setError(null);
 
         const response = await fetch(
-          `https://api.t-coin.code-studio4.com/api/transaction-history/${apiEndpoint}`,
+          `https://api.backend.t-coin.saveneed.com/api/transaction-history/${apiEndpoint}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

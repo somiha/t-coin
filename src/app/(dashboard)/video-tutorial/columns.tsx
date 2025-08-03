@@ -128,7 +128,7 @@ function EditVideoModal({ video }: { video: Video }) {
     if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
 
     const res = await fetch(
-      `https://api.t-coin.code-studio4.com/api/video-tutorial/${video.id}`,
+      `https://api.backend.t-coin.saveneed.com/api/video-tutorial/${video.id}`,
       {
         method: "PUT",
         headers: {
@@ -219,7 +219,7 @@ function DeleteVideoModal({ video }: { video: Video }) {
     if (!token) return;
 
     const res = await fetch(
-      `https://api.t-coin.code-studio4.com/api/video-tutorial/${video.id}`,
+      `https://api.backend.t-coin.saveneed.com/api/video-tutorial/${video.id}`,
       {
         method: "DELETE",
         headers: {

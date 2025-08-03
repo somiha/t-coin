@@ -35,7 +35,7 @@ export default function ChargesManagement() {
         }
 
         const response = await fetch(
-          "https://api.t-coin.code-studio4.com/api/charges",
+          "https://api.backend.t-coin.saveneed.com/api/charges",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -102,7 +102,7 @@ export default function ChargesManagement() {
       };
 
       const response = await fetch(
-        "https://api.t-coin.code-studio4.com/api/charges/upsert",
+        "https://api.backend.t-coin.saveneed.com/api/charges/upsert",
         {
           method: "POST",
           headers: {

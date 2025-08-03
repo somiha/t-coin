@@ -40,7 +40,7 @@ export default function PrivacyPolicyPage() {
       }
 
       const response = await fetch(
-        "https://api.t-coin.code-studio4.com/api/privacy-policy",
+        "https://api.backend.t-coin.saveneed.com/api/privacy-policy",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ export default function PrivacyPolicyPage() {
       }
 
       const response = await fetch(
-        "https://api.t-coin.code-studio4.com/api/privacy-policy",
+        "https://api.backend.t-coin.saveneed.com/api/privacy-policy",
         {
           method: "POST",
           headers: {

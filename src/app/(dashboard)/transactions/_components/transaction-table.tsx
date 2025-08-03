@@ -74,7 +74,8 @@ export function TransactionsTable({
         setLoading(true);
         setError(null);
 
-        let url = "https://api.t-coin.code-studio4.com/api/transaction-history";
+        let url =
+          "https://api.backend.t-coin.saveneed.com/api/transaction-history";
         if (type) {
           url += `/filter?type=${encodeURIComponent(type)}`;
         } else if (apiEndpoint) {

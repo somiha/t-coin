@@ -47,7 +47,7 @@ export default function AddCurrency() {
 
     try {
       const res = await fetch(
-        "https://api.t-coin.code-studio4.com/api/tcoin-rates",
+        "https://api.backend.t-coin.saveneed.com/api/tcoin-rates",
         {
           method: "POST",
           headers: {
