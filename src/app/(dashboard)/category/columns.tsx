@@ -186,6 +186,7 @@ function ViewCategoryDetails({ category }: { category: Category }) {
 
 function EditCategoryModal({ category }: { category: Category }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: category.name,
   });
@@ -198,7 +199,7 @@ function EditCategoryModal({ category }: { category: Category }) {
   const handleSave = async () => {
     const token = localStorage.getItem("authToken");
     if (!token) return;
-
+    setLoading(true);
     try {
       const response = await fetch(
         `https://api.t-coin.code-studio4.com/api/categories/${category.id}`,
@@ -217,7 +218,7 @@ function EditCategoryModal({ category }: { category: Category }) {
     } catch (error) {
       console.error("Error updating category", error);
     }
-
+    setLoading(false);
     setIsOpen(false);
   };
 
@@ -252,8 +253,9 @@ function EditCategoryModal({ category }: { category: Category }) {
               <Button
                 onClick={handleSave}
                 className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+                disabled={loading}
               >
-                Save
+                {loading ? "Saving..." : "Save"}
               </Button>
             </DialogFooter>
           </div>
@@ -265,11 +267,12 @@ function EditCategoryModal({ category }: { category: Category }) {
 
 function DeleteCategoryModal({ category }: { category: Category }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
     const token = localStorage.getItem("authToken");
     if (!token) return;
-
+    setLoading(true);
     try {
       const response = await fetch(
         `https://api.t-coin.code-studio4.com/api/categories/${category.id}`,
@@ -286,7 +289,7 @@ function DeleteCategoryModal({ category }: { category: Category }) {
     } catch (error) {
       console.error("Error deleting category", error);
     }
-
+    setLoading(false);
     setIsOpen(false);
   };
 
@@ -319,8 +322,9 @@ function DeleteCategoryModal({ category }: { category: Category }) {
               variant="destructive"
               onClick={handleDelete}
               className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+              disabled={loading}
             >
-              Delete
+              {loading ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -15,6 +15,7 @@ export default function AddInvestment() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -69,7 +70,7 @@ export default function AddInvestment() {
     formData.append("active_status", String(form.active_status));
     formData.append("refund_status", String(form.refund_status));
     if (imageFile) formData.append("image", imageFile);
-
+    setLoading(true);
     try {
       const res = await fetch(
         "https://api.t-coin.code-studio4.com/api/investment-projects",
@@ -94,6 +95,8 @@ export default function AddInvestment() {
       console.error("Error:", error);
       alert("An error occurred.");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -209,8 +212,12 @@ export default function AddInvestment() {
               </label>
             </div>
 
-            <Button type="submit" className="w-full">
-              Save
+            <Button
+              type="submit"
+              className="text-white bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] hover:opacity-90"
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Save"}
             </Button>
           </CardContent>
         </Card>

@@ -206,8 +206,10 @@ function EditNewsModal({ id }: { id: string }) {
 
 function DeleteNewsModal({ id }: { id: string }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
@@ -231,6 +233,9 @@ function DeleteNewsModal({ id }: { id: string }) {
       console.error("Error deleting news:", error);
       alert("Something went wrong");
     }
+
+    setLoading(false);
+    setIsOpen(false);
   };
 
   return (
@@ -257,8 +262,12 @@ function DeleteNewsModal({ id }: { id: string }) {
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={loading}
+            >
+              {loading ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -158,7 +158,12 @@ export default function ChargesManagement() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold">Charges Configuration</h2>
         {!isEditing && (
-          <Button onClick={() => setIsEditing(true)}>Edit Charges</Button>
+          <Button
+            className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+            onClick={() => setIsEditing(true)}
+          >
+            Edit Charges
+          </Button>
         )}
       </div>
 
@@ -275,7 +280,11 @@ export default function ChargesManagement() {
 
               {isEditing && (
                 <div className="flex gap-2 pt-4">
-                  <Button type="submit" disabled={submitting}>
+                  <Button
+                    className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+                    type="submit"
+                    disabled={submitting}
+                  >
                     {submitting ? "Saving..." : "Save Changes"}
                   </Button>
                   <Button

@@ -370,7 +370,12 @@ function EditBankModal({ id }: { id: string }) {
                 <Button variant="outline" onClick={() => setIsOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleSubmit} disabled={loading}>
+                <Button
+                  className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+                  type="submit"
+                  onClick={handleSubmit}
+                  disabled={loading}
+                >
                   {loading ? "Saving..." : "Save Changes"}
                 </Button>
               </DialogFooter>
@@ -384,8 +389,11 @@ function EditBankModal({ id }: { id: string }) {
 
 function DeleteBankModal({ id }: { id: string }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
+    setLoading(true);
+
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
@@ -408,6 +416,8 @@ function DeleteBankModal({ id }: { id: string }) {
     } catch (error) {
       console.error("Error deleting bank:", error);
       alert("Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -435,8 +445,13 @@ function DeleteBankModal({ id }: { id: string }) {
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
+            <Button
+              className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={loading}
+            >
+              {loading ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

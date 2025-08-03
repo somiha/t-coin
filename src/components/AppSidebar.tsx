@@ -97,6 +97,7 @@ const baseMenuItems: MenuItem[] = [
 
 const adminItems: MenuItem[] = [
   { name: "Agent List", icon: Handshake, href: "/agents" },
+  { name: "T-Coin Cash Out", icon: Users, href: "/tcoin-cash-out" },
   // { name: "Agent Money to Tcoin", icon: Users, href: "/agent-money-to-tcoin" },
   // { name: "Admin Tcoin to money", icon: Users, href: "/admin-tcoin-to-money" },
 ];

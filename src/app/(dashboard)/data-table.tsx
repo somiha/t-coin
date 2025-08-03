@@ -24,6 +24,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -43,6 +44,8 @@ export function DataTable<TData, TValue>({
   data,
   meta,
 }: DataTableProps<TData, TValue>) {
+  const [pageSize, setPageSize] = useState(8);
+
   const table = useReactTable({
     data,
     columns,
@@ -51,7 +54,7 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {
       pagination: {
-        pageSize: 8,
+        pageSize: pageSize,
       },
     },
   });
@@ -133,6 +136,31 @@ export function DataTable<TData, TValue>({
             Page {table.getState().pagination.pageIndex + 1} of{" "}
             {table.getPageCount()} • {table.getRowModel().rows.length} of{" "}
             {data.length} rows
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label
+              htmlFor="rowsPerPage"
+              className="text-sm text-muted-foreground"
+            >
+              Rows per page:
+            </label>
+            <select
+              id="rowsPerPage"
+              className="border border-gray-300 rounded px-2 py-1 text-sm"
+              value={pageSize}
+              onChange={(e) => {
+                const newSize = Number(e.target.value);
+                setPageSize(newSize);
+                table.setPageSize(newSize);
+              }}
+            >
+              {[5, 8, 10, 20, 50].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="flex items-center gap-2">

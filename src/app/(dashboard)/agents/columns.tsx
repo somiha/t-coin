@@ -118,7 +118,11 @@ function AgentActions({
       {/* View Details Button */}
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Button
+            className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+            variant="ghost"
+            size="sm"
+          >
             <Eye className="h-4 w-4" />
           </Button>
         </DialogTrigger>

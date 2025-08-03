@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
 export default function AddCountryPage() {
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
     code: "",
@@ -34,7 +35,7 @@ export default function AddCountryPage() {
       alert("Please fill out all fields.");
       return;
     }
-
+    setLoading(true);
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
@@ -62,6 +63,8 @@ export default function AddCountryPage() {
       console.error("Error submitting country:", error);
       alert("Something went wrong.");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -90,8 +93,9 @@ export default function AddCountryPage() {
           <Button
             className="w-full bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white"
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Save Country
+            {loading ? "Adding..." : "Add Country"}
           </Button>
         </CardContent>
       </Card>

@@ -229,6 +229,7 @@ function EditObjectModal({ id }: { id: string }) {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
@@ -250,6 +251,8 @@ function EditObjectModal({ id }: { id: string }) {
     } catch (error) {
       console.error("Error updating object:", error);
     }
+    setLoading(false);
+    setIsOpen(false);
   };
 
   return (
@@ -321,7 +324,13 @@ function EditObjectModal({ id }: { id: string }) {
                 <Button variant="outline" onClick={() => setIsOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleSubmit}>Save</Button>
+                <Button
+                  onClick={handleSubmit}
+                  className="text-white bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] hover:opacity-90"
+                  disabled={loading}
+                >
+                  {loading ? "Updating..." : "Update"}
+                </Button>
               </DialogFooter>
             </div>
           )}
@@ -333,8 +342,10 @@ function EditObjectModal({ id }: { id: string }) {
 
 function DeleteObjectModal({ id }: { id: string }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
@@ -354,6 +365,8 @@ function DeleteObjectModal({ id }: { id: string }) {
     } catch (error) {
       console.error("Error deleting object:", error);
     }
+    setLoading(false);
+    setIsOpen(false);
   };
 
   return (
@@ -380,8 +393,13 @@ function DeleteObjectModal({ id }: { id: string }) {
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
+            <Button
+              variant="destructive"
+              className="text-white bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] hover:opacity-90"
+              onClick={handleDelete}
+              disabled={loading}
+            >
+              {loading ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

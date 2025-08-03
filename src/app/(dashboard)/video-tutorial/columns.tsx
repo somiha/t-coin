@@ -114,8 +114,10 @@ function EditVideoModal({ video }: { video: Video }) {
   const [description, setDescription] = useState(video.description);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleUpdate = async () => {
+    setLoading(true);
     const token = localStorage.getItem("authToken");
     if (!token) return;
 
@@ -142,7 +144,7 @@ function EditVideoModal({ video }: { video: Video }) {
     } else {
       alert(result.message || "Update failed");
     }
-
+    setLoading(false);
     setOpen(false);
   };
 
@@ -192,7 +194,13 @@ function EditVideoModal({ video }: { video: Video }) {
               <Button variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleUpdate}>Save</Button>
+              <Button
+                onClick={handleUpdate}
+                className="text-white bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] hover:opacity-90"
+                disabled={loading}
+              >
+                {loading ? "Updating..." : "Update"}
+              </Button>
             </DialogFooter>
           </div>
         </DialogContent>
@@ -203,8 +211,10 @@ function EditVideoModal({ video }: { video: Video }) {
 
 function DeleteVideoModal({ video }: { video: Video }) {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
+    setLoading(true);
     const token = localStorage.getItem("authToken");
     if (!token) return;
 
@@ -224,7 +234,7 @@ function DeleteVideoModal({ video }: { video: Video }) {
     } else {
       alert(result.message || "Delete failed");
     }
-
+    setLoading(false);
     setOpen(false);
   };
 
@@ -247,8 +257,12 @@ function DeleteVideoModal({ video }: { video: Video }) {
             <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Confirm Delete
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={loading}
+            >
+              {loading ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

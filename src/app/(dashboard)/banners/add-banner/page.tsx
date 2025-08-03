@@ -138,7 +138,7 @@ export default function AddBannerPage() {
             <Button
               className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white w-full"
               size="md"
-              type="button"
+              type="submit"
               onClick={handleSubmit}
             >
               Save Banner

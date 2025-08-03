@@ -57,6 +57,7 @@ export const countryColumns: ColumnDef<Country>[] = [
 
 function EditCountryModal({ country }: { country: Country }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: country.name,
     code: country.code,
@@ -74,7 +75,7 @@ function EditCountryModal({ country }: { country: Country }) {
   const handleSave = async () => {
     const token = localStorage.getItem("authToken");
     if (!token) return;
-
+    setLoading(true);
     try {
       const response = await fetch(
         `https://api.t-coin.code-studio4.com/api/country/${country.id}`,
@@ -93,7 +94,7 @@ function EditCountryModal({ country }: { country: Country }) {
     } catch (error) {
       console.error("Error updating country", error);
     }
-
+    setLoading(false);
     setIsOpen(false);
   };
 
@@ -139,7 +140,13 @@ function EditCountryModal({ country }: { country: Country }) {
               <Button variant="outline" onClick={() => setIsOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSave}>Save</Button>
+              <Button
+                className="text-white bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] hover:opacity-90"
+                onClick={handleSave}
+                disabled={loading}
+              >
+                {loading ? "Updating..." : "Update"}
+              </Button>
             </DialogFooter>
           </div>
         </DialogContent>
@@ -151,10 +158,12 @@ function EditCountryModal({ country }: { country: Country }) {
 function DeleteCountryModal({ country }: { country: Country }) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   const handleDelete = async () => {
     const token = localStorage.getItem("authToken");
     if (!token) return;
-
+    setLoading(true);
     try {
       const response = await fetch(
         `https://api.t-coin.code-studio4.com/api/country/${country.id}`,
@@ -171,7 +180,7 @@ function DeleteCountryModal({ country }: { country: Country }) {
     } catch (error) {
       console.error("Error deleting country", error);
     }
-
+    setLoading(false);
     setIsOpen(false);
   };
 
@@ -199,8 +208,13 @@ function DeleteCountryModal({ country }: { country: Country }) {
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
+            <Button
+              variant="destructive"
+              className="text-white bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] hover:opacity-90"
+              onClick={handleDelete}
+              disabled={loading}
+            >
+              {loading ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -74,6 +74,8 @@ export const columns: ColumnDef<Banner>[] = [
 
 function EditBannerModal({ banner }: { banner: Banner }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     title: banner.title,
     description: banner.description,
@@ -111,6 +113,8 @@ function EditBannerModal({ banner }: { banner: Banner }) {
     patchData.append("active", String(formData.active));
     if (selectedFile) patchData.append("image", selectedFile);
 
+    setLoading(true);
+
     try {
       const response = await fetch(
         `https://api.t-coin.code-studio4.com/api/banners/${banner.id}`,
@@ -135,7 +139,7 @@ function EditBannerModal({ banner }: { banner: Banner }) {
     } catch (error) {
       console.error("Error updating banner", error);
     }
-
+    setLoading(false);
     setIsOpen(false);
   };
 
@@ -205,8 +209,9 @@ function EditBannerModal({ banner }: { banner: Banner }) {
               <Button
                 onClick={handleSave}
                 className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white"
+                disabled={loading}
               >
-                Save Changes
+                {loading ? "Saving..." : "Save"}
               </Button>
             </DialogFooter>
           </div>
@@ -218,11 +223,12 @@ function EditBannerModal({ banner }: { banner: Banner }) {
 
 function DeleteBannerModal({ banner }: { banner: Banner }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
     const token = localStorage.getItem("authToken");
     if (!token) return;
-
+    setLoading(true);
     try {
       const response = await fetch(
         `https://api.t-coin.code-studio4.com/api/banners/${banner.id}`,
@@ -240,6 +246,7 @@ function DeleteBannerModal({ banner }: { banner: Banner }) {
       console.error("Error deleting banner", error);
     }
 
+    setLoading(false);
     setIsOpen(false);
   };
 
@@ -280,8 +287,9 @@ function DeleteBannerModal({ banner }: { banner: Banner }) {
               variant="destructive"
               onClick={handleDelete}
               className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white ml-2"
+              disabled={loading}
             >
-              Delete Banner
+              {loading ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>
