@@ -14,6 +14,7 @@ interface TransactionsPageProps {
 
 interface ApiTransaction {
   id: number;
+  type: string;
   transaction_type: string;
   amount: string;
   local_currency_amount: string;
@@ -100,7 +101,8 @@ export function TransactionsPage({
             item.sender_image_url ||
             "/person-fill.png",
           method: item.method_type || "N/A",
-          type: item.transaction_type || "N/A",
+          type: item.type || "N/A",
+          transaction_type: item.transaction_type || "N/A",
           amount: item.amount,
           charge: parseFloat(item.local_currency_amount || "0"),
           date: item.transaction_date,
@@ -120,7 +122,7 @@ export function TransactionsPage({
           receiver_name: item.receiver_name || undefined,
           sender_image_url: item.sender_image_url || undefined,
           receiver_image_url: item.receiver_image_url || undefined,
-          transaction_type: item.transaction_type || undefined,
+
           local_currency_amount: item.local_currency_amount || undefined,
         }));
 

@@ -318,7 +318,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil } from "lucide-react";
+import { Eye, Pencil, UploadCloud } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -387,8 +387,12 @@ export const columns: ColumnDef<Transaction>[] = [
     header: "Method",
   },
   {
-    accessorKey: "type",
+    accessorKey: "transaction_type",
     header: "Transaction Type",
+  },
+  {
+    accessorKey: "type",
+    header: "User Type",
   },
   {
     accessorKey: "amount",
@@ -434,8 +438,20 @@ function ApproveTransactionButton({
   transaction: Transaction;
 }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [approverNote, setApproverNote] = useState("Deduction validated");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-  const handleApprove = async () => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async (selectedAction: "APPROVE" | "REJECT") => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("authToken");
@@ -443,21 +459,32 @@ function ApproveTransactionButton({
         throw new Error("Missing authToken");
       }
 
+      // Determine approverEntityType based on transaction type
+
+      // Create form data for file upload
+      console.log("Transaction ID:", transaction.id);
+      console.log("Approver Entity Type:", transaction.type);
+      const formData = new FormData();
+      formData.append("transactionId", transaction.id.toString());
+      formData.append(
+        "approverEntityId",
+        (transaction.user?.id || 1).toString()
+      );
+      formData.append("approverEntityType", transaction.type);
+      formData.append("action", selectedAction);
+      formData.append("approverNote", approverNote);
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+
       const response = await fetch(
         "https://api.t-coin.code-studio4.com/tcoin/operation/approve",
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            transactionId: transaction.id,
-            approverEntityId: transaction.user?.id || 1, // Default to 1 if user id not available
-            approverEntityType: "user",
-            action: "APPROVE",
-            approverNote: "Deduction validated",
-          }),
+          body: formData,
         }
       );
 
@@ -468,29 +495,158 @@ function ApproveTransactionButton({
       const data = await response.json();
 
       if (data.success) {
-        toast.success("Transaction approved successfully");
-
+        toast.success(
+          `Transaction ${selectedAction.toLowerCase()}d successfully`
+        );
+        setIsModalOpen(false);
         window.location.reload();
       } else {
-        throw new Error(data.message || "Failed to approve transaction");
+        throw new Error(
+          data.message ||
+            `Failed to ${selectedAction.toLowerCase()} transaction`
+        );
       }
     } catch (error) {
-      console.error("Approval error:", error);
-      toast.error("Approval failed");
+      console.error("Error:", error);
+      toast.error(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Button
-      size="icon"
-      variant="outline"
-      onClick={handleApprove}
-      disabled={isLoading}
-    >
-      <Pencil className="w-4 h-4" />
-    </Button>
+    <>
+      <Button
+        size="icon"
+        variant="outline"
+        onClick={() => setIsModalOpen(true)}
+      >
+        <Pencil className="w-4 h-4" />
+      </Button>
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="fixed max-h-[90vh] w-[500px] max-w-[90vw] overflow-y-auto">
+          <DialogHeader className="sticky top-0 bg-white z-10 pt-2 pb-4">
+            <DialogTitle className="text-md text-transparent bg-clip-text bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))]">
+              Transaction Review
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+              {transaction.image && (
+                <div className="w-20 h-20 relative rounded-md overflow-hidden flex-shrink-0 border">
+                  <Image
+                    src={transaction.image}
+                    alt="Transaction"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <div className="space-y-1">
+                <h3 className="font-medium">Transaction #{transaction.id}</h3>
+                <p className="text-sm">
+                  <span className="font-medium">Amount:</span>{" "}
+                  {transaction.amount} T-Coin
+                </p>
+                <p className="text-sm">
+                  <span className="font-medium">Type:</span>{" "}
+                  {transaction.transaction_type || transaction.type}
+                </p>
+                <p className="text-sm">
+                  <span className="font-medium">Status:</span>
+                  <span
+                    className={`ml-1 px-2 py-0.5 rounded-full text-xs ${
+                      transaction.transaction_status === "Pending"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : transaction.transaction_status === "Completed"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {transaction.transaction_status}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 border rounded-lg">
+              <label
+                htmlFor="approverNote"
+                className="block text-sm font-medium mb-2"
+              >
+                Review Note
+              </label>
+              <textarea
+                id="approverNote"
+                className="w-full p-3 border rounded-md min-h-[100px] text-sm"
+                value={approverNote}
+                onChange={(e) => setApproverNote(e.target.value)}
+                placeholder="Enter your review note..."
+              />
+            </div>
+
+            <div className="p-4 border rounded-lg">
+              <label className="block text-sm font-medium mb-2">
+                Upload Approval Image
+              </label>
+              <div className="flex items-center gap-4">
+                <label className="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+                  <div className="flex flex-col items-center justify-center">
+                    <UploadCloud className="w-8 h-8 text-gray-400" />
+                    <p className="text-sm text-gray-500 mt-2">
+                      {imageFile ? imageFile.name : "Click to upload image"}
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </label>
+                {previewImage && (
+                  <div className="w-20 h-20 relative rounded-md overflow-hidden border">
+                    <Image
+                      src={previewImage}
+                      alt="Preview"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsModalOpen(false)}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => handleSubmit("REJECT")}
+                disabled={isLoading}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                {isLoading ? "Processing..." : "Reject"}
+              </Button>
+              <Button
+                onClick={() => handleSubmit("APPROVE")}
+                disabled={isLoading}
+                className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+              >
+                {isLoading ? "Processing..." : "Approve"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
