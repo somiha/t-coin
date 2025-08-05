@@ -66,7 +66,7 @@ export default function ExchangeMoneyToTCoin() {
 
         const user = JSON.parse(userStr);
         const response = await fetch(
-          `https://api.backend.t-coin.saveneed.com/api/super-admin/user-list/${user.id}`,
+          `https://api.t-coin.code-studio4.com/api/super-admin/user-list/${user.id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -144,7 +144,7 @@ export default function ExchangeMoneyToTCoin() {
       }
 
       const response = await fetch(
-        "https://api.backend.t-coin.saveneed.com/exchange-admin-money-to-tcoin",
+        "https://api.t-coin.code-studio4.com/exchange-admin-money-to-tcoin",
         {
           method: "POST",
           headers: {

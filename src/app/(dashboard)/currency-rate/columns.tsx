@@ -68,7 +68,7 @@ function EditCurrencyModal({ currency }: { currency: Currency }) {
   const handleSubmit = async () => {
     try {
       const res = await fetch(
-        `https://api.backend.t-coin.saveneed.com/api/tcoin-rates/${currency.id}`,
+        `https://api.t-coin.code-studio4.com/api/tcoin-rates/${currency.id}`,
         {
           method: "PUT",
           headers: {
@@ -174,7 +174,7 @@ function DeleteCurrencyModal({ currency }: { currency: Currency }) {
   const handleDelete = async () => {
     try {
       const res = await fetch(
-        `https://api.backend.t-coin.saveneed.com/api/tcoin-rates/${currency.id}`,
+        `https://api.t-coin.code-studio4.com/api/tcoin-rates/${currency.id}`,
         {
           method: "DELETE",
           headers: {

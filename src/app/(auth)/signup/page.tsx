@@ -50,7 +50,7 @@ export default function SignUpPage() {
     const fetchTerms = async () => {
       try {
         const response = await fetch(
-          "https://api.backend.t-coin.saveneed.com/api/terms-and-conditions"
+          "https://api.t-coin.code-studio4.com/api/terms-and-conditions"
         );
 
         if (!response.ok) {
@@ -127,7 +127,7 @@ export default function SignUpPage() {
       }
 
       const response = await fetch(
-        "https://api.backend.t-coin.saveneed.com/api/admins/with-multiple-files",
+        "https://api.t-coin.code-studio4.com/api/admins/with-multiple-files",
         {
           method: "POST",
           body: formDataToSend,

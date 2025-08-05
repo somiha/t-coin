@@ -56,7 +56,7 @@ export default function ExchangeTCoinToMoney() {
       };
 
       const response = await fetch(
-        "https://api.backend.t-coin.saveneed.com/exchange-admin-tcoin-to-money",
+        "https://api.t-coin.code-studio4.com/exchange-admin-tcoin-to-money",
         {
           method: "POST",
           headers: {

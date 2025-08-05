@@ -47,7 +47,7 @@ function UserActions({
     setIsSending(true);
     try {
       const response = await fetch(
-        `https://api.backend.t-coin.saveneed.com/api/notifications`,
+        `https://api.t-coin.code-studio4.com/api/notifications`,
         {
           method: "POST",
           headers: {

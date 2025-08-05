@@ -71,7 +71,7 @@ function ViewCategoryDetails({ category }: { category: Category }) {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://api.backend.t-coin.saveneed.com/api/categories/${category.id}`,
+        `https://api.t-coin.code-studio4.com/api/categories/${category.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -202,7 +202,7 @@ function EditCategoryModal({ category }: { category: Category }) {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://api.backend.t-coin.saveneed.com/api/categories/${category.id}`,
+        `https://api.t-coin.code-studio4.com/api/categories/${category.id}`,
         {
           method: "PUT",
           headers: {
@@ -275,7 +275,7 @@ function DeleteCategoryModal({ category }: { category: Category }) {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://api.backend.t-coin.saveneed.com/api/categories/${category.id}`,
+        `https://api.t-coin.code-studio4.com/api/categories/${category.id}`,
         {
           method: "DELETE",
           headers: {

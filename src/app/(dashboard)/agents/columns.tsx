@@ -72,10 +72,10 @@ function AgentActions({
       let body = null;
 
       if (type === "delete") {
-        endpoint = `https://api.backend.t-coin.saveneed.com/api/agents/${agent.id}`;
+        endpoint = `https://api.t-coin.code-studio4.com/api/agents/${agent.id}`;
         method = "DELETE";
       } else if (type === "toggle") {
-        endpoint = `https://api.backend.t-coin.saveneed.com/api/agents/${agent.id}`;
+        endpoint = `https://api.t-coin.code-studio4.com/api/agents/${agent.id}`;
         method = "PUT";
         body = JSON.stringify({
           canReceiveRemittanceList: !agent.canReceiveRemittanceList,

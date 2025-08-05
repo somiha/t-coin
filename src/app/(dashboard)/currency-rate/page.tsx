@@ -26,7 +26,7 @@ export default function CurrencyPage() {
       return;
     }
 
-    fetch("https://api.backend.t-coin.saveneed.com/api/tcoin-rates", {
+    fetch("https://api.t-coin.code-studio4.com/api/tcoin-rates", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

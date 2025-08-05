@@ -39,7 +39,7 @@ export default function AddCountryPage() {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        "https://api.backend.t-coin.saveneed.com/api/country",
+        "https://api.t-coin.code-studio4.com/api/country",
         {
           method: "POST",
           headers: {

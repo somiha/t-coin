@@ -74,7 +74,7 @@ export default function ExchangeAgentMoneyToTCoin() {
         console.log("Fetching agents for admin ID:", user.id); // Debug log
 
         const response = await fetch(
-          `https://api.backend.t-coin.saveneed.com/api/admins/${user.id}/agents`,
+          `https://api.t-coin.code-studio4.com/api/admins/${user.id}/agents`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -165,7 +165,7 @@ export default function ExchangeAgentMoneyToTCoin() {
       console.log("Submitting payload:", payload); // Debug log
 
       const response = await fetch(
-        "https://api.backend.t-coin.saveneed.com/exchange-agent-money-to-tcoin",
+        "https://api.t-coin.code-studio4.com/exchange-agent-money-to-tcoin",
         {
           method: "POST",
           headers: {

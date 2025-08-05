@@ -33,7 +33,7 @@ export default function AddCategoryPage() {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        "https://api.backend.t-coin.saveneed.com/api/categories",
+        "https://api.t-coin.code-studio4.com/api/categories",
         {
           method: "POST",
           headers: {

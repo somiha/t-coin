@@ -74,8 +74,7 @@ export function TransactionsTable({
         setLoading(true);
         setError(null);
 
-        let url =
-          "https://api.backend.t-coin.saveneed.com/api/transaction-history";
+        let url = "https://api.t-coin.code-studio4.com/api/transaction-history";
         if (type) {
           url += `/filter?type=${encodeURIComponent(type)}`;
         } else if (apiEndpoint) {
@@ -97,7 +96,7 @@ export function TransactionsTable({
         if (!data.success || !Array.isArray(data.data)) {
           throw new Error(data.message || "Invalid API response structure");
         }
-
+        console.log(url);
         // Transform API data to match Transaction type with all details
         const transformedData: Transaction[] = data.data.map((item) => ({
           id: item.id,

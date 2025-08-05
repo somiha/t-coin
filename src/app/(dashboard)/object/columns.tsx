@@ -87,7 +87,7 @@ function ViewObjectDetails({ id }: { id: string }) {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        `https://api.backend.t-coin.saveneed.com/api/objects/${id}`,
+        `https://api.t-coin.code-studio4.com/api/objects/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -195,7 +195,7 @@ function EditObjectModal({ id }: { id: string }) {
 
       // Fetch game data
       const gameResponse = await fetch(
-        `https://api.backend.t-coin.saveneed.com/api/objects/${id}`,
+        `https://api.t-coin.code-studio4.com/api/objects/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const gameData: ApiResponse<Game> = await gameResponse.json();
@@ -212,7 +212,7 @@ function EditObjectModal({ id }: { id: string }) {
 
       // Fetch categories
       const categoriesResponse = await fetch(
-        "https://api.backend.t-coin.saveneed.com/api/categories",
+        "https://api.t-coin.code-studio4.com/api/categories",
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const categoriesData: ApiResponse<Category[]> =
@@ -233,7 +233,7 @@ function EditObjectModal({ id }: { id: string }) {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        `https://api.backend.t-coin.saveneed.com/api/objects/${id}`,
+        `https://api.t-coin.code-studio4.com/api/objects/${id}`,
         {
           method: "PUT",
           headers: {
@@ -349,7 +349,7 @@ function DeleteObjectModal({ id }: { id: string }) {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        `https://api.backend.t-coin.saveneed.com/api/objects/${id}`,
+        `https://api.t-coin.code-studio4.com/api/objects/${id}`,
         {
           method: "DELETE",
           headers: {

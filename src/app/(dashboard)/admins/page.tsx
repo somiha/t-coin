@@ -78,7 +78,7 @@ export default function Page() {
 
       const user = JSON.parse(userStr);
       const response = await fetch(
-        `https://api.backend.t-coin.saveneed.com/api/super-admin/user-list/${user.id}`,
+        `https://api.t-coin.code-studio4.com/api/super-admin/user-list/${user.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

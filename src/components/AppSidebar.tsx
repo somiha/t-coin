@@ -58,6 +58,10 @@ const baseMenuItems: MenuItem[] = [
       { name: "Send Money", href: "/transactions/send-money" },
       { name: "Cash Out", href: "/transactions/cash-out" },
       { name: "T-coin Received", href: "/transactions/tcoin-receieved" },
+      {
+        name: "T-coin Cash Out Request",
+        href: "/transactions/tcoin-cash-request",
+      },
     ],
   },
   { name: "Currency Rate", icon: TrendingUp, href: "/currency-rate" },

@@ -49,7 +49,7 @@ export default function AddObjectPage() {
 
       try {
         const response = await fetch(
-          "https://api.backend.t-coin.saveneed.com/api/categories",
+          "https://api.t-coin.code-studio4.com/api/categories",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -103,7 +103,7 @@ export default function AddObjectPage() {
       }
 
       const response = await fetch(
-        "https://api.backend.t-coin.saveneed.com/api/objects",
+        "https://api.t-coin.code-studio4.com/api/objects",
         {
           method: "POST",
           headers: {
