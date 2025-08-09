@@ -36,6 +36,7 @@ interface DataTableProps<TData, TValue> {
     updateUser?: (userId: string, updates: Partial<TData>) => void;
     deleteUser?: (userId: string) => void;
     refetchData?: () => void;
+    refreshData?: () => void;
   };
 }
 
@@ -60,7 +61,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <Card className="p-4 mt-5">
+    <Card className="p-4 mt-5 w-full">
       <div className="mb-4">
         {/* <div className="mb-4 relative">
           <Input placeholder="Search User" className="max-w-sm pl-10" />
@@ -68,8 +69,8 @@ export function DataTable<TData, TValue>({
         </div> */}
       </div>
 
-      <div className="overflow-x-auto">
-        <Table>
+      <div className="w-full overflow-x-auto">
+        <Table className="min-w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
@@ -109,7 +110,7 @@ export function DataTable<TData, TValue>({
                   } hover:bg-muted/70`}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="px-4 py-3">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

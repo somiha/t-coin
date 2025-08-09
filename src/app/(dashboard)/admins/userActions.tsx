@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, MouseEvent, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Loader2,
@@ -11,6 +11,7 @@ import {
   ToggleRight,
   Check,
   UserCog,
+  Power,
 } from "lucide-react";
 import {
   Dialog,
@@ -18,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -35,6 +37,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "lucide-react";
 
 interface Admin {
   id: string;
@@ -57,16 +61,12 @@ interface ApiAdminResponse {
   canReceiveRemittanceList?: boolean;
   image?: string | null;
 }
-interface UserActionsProps {
-  user: User;
-  onActionComplete?: () => void;
-  onUserUpdate?: (updates: Partial<User>) => void;
-  onUserDelete?: (userId: string) => void;
-}
+
 interface User {
   id: string;
   type: "admin" | "agent";
   isApproved: boolean;
+  status: "active" | "hold" | "blocked";
   canReceiveRemittanceList?: boolean;
   name: string;
   email: string;
@@ -88,20 +88,33 @@ interface User {
   local_currency_balance?: string;
 }
 
+interface UserActionsProps {
+  user: User;
+  onActionComplete?: () => void;
+  onUserUpdate?: (updates: Partial<User>) => void;
+  onUserDelete?: (userId: string) => void;
+  onStatusChange?: (newStatus: "active" | "hold" | "blocked") => void;
+}
+
 export function UserActions({
   user,
   onActionComplete,
   onUserUpdate,
   onUserDelete,
+  onStatusChange,
 }: UserActionsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
+  const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [actionType, setActionType] = useState<
-    "approve" | "delete" | "toggle" | "assign"
+    "approve" | "delete" | "toggle" | "assign" | "status"
   >();
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [selectedAdminId, setSelectedAdminId] = useState("");
+  const [statusNote, setStatusNote] = useState("");
+  const [newStatus, setNewStatus] = useState<"active" | "hold" | "blocked">(
+    user.status
+  );
 
   const fetchAdmins = async () => {
     try {
@@ -141,97 +154,8 @@ export function UserActions({
     }
   };
 
-  //   const handleAction = async (
-  //     type: "approve" | "delete" | "toggle" | "assign"
-  //   ) => {
-  //     setActionType(type);
-  //     setIsLoading(true);
-
-  //     try {
-  //       const token = localStorage.getItem("authToken");
-  //       const userStr = localStorage.getItem("user");
-  //       const currentUser = userStr ? JSON.parse(userStr) : null;
-
-  //       if (!token || !currentUser?.id) {
-  //         throw new Error("Authorization error. Please log in again.");
-  //       }
-
-  //       let endpoint = "";
-  //       let method = "GET";
-  //       let body = null;
-
-  //       switch (type) {
-  //         case "approve":
-  //           endpoint = `https://api.t-coin.code-studio4.com/api/super-admin/${currentUser.id}/approve`;
-  //           method = "POST";
-  //           body = JSON.stringify({
-  //             approveUserId: user.id,
-  //             type: user.type,
-  //             approveStatus: true,
-  //           });
-  //           break;
-  //         case "delete":
-  //           endpoint =
-  //             user.type === "admin"
-  //               ? `https://api.t-coin.code-studio4.com/api/admins/${user.id}`
-  //               : `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
-  //           method = "DELETE";
-  //           break;
-  //         case "toggle":
-  //           endpoint = `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
-  //           method = "PUT";
-  //           body = JSON.stringify({
-  //             canReceiveRemittanceList: !user.canReceiveRemittanceList,
-  //           });
-  //           break;
-  //         case "assign":
-  //           if (!selectedAdminId) throw new Error("Please select an admin");
-  //           endpoint = `https://api.t-coin.code-studio4.com/api/agents/${user.id}`;
-  //           method = "PUT";
-  //           body = JSON.stringify({
-  //             newAdminId: selectedAdminId,
-  //           });
-  //           break;
-  //       }
-
-  //       const response = await fetch(endpoint, {
-  //         method,
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //         body,
-  //       });
-
-  //       if (!response.ok) {
-  //         const errorData = await response.json().catch(() => ({}));
-  //         throw new Error(errorData.message || "Action failed");
-  //       }
-
-  //       toast.success(
-  //         type === "approve"
-  //           ? `${user.type.toUpperCase()} approved successfully`
-  //           : type === "delete"
-  //           ? `${user.type.toUpperCase()} deleted successfully`
-  //           : type === "toggle"
-  //           ? `Remittance ${
-  //               !user.canReceiveRemittanceList ? "enabled" : "disabled"
-  //             } successfully`
-  //           : "Admin assigned successfully"
-  //       );
-  //       onActionComplete?.();
-  //     } catch (error) {
-  //       console.error("Action error:", error);
-  //       toast.error(
-  //         error instanceof Error ? error.message : "Something went wrong"
-  //       );
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
   const handleAction = async (
-    type: "approve" | "delete" | "toggle" | "assign"
+    type: "approve" | "delete" | "toggle" | "assign" | "status"
   ) => {
     setActionType(type);
     setIsLoading(true);
@@ -281,6 +205,27 @@ export function UserActions({
             newAdminId: selectedAdminId,
           });
           break;
+        case "status":
+          if (user.type === "admin") {
+            endpoint = `https://api.t-coin.code-studio4.com/api/users/bulk-update/multiple`;
+            method = "PUT";
+            body = JSON.stringify({
+              userIds: [user.id], // or multiple IDs if needed
+              userType: "admin",
+              updateData: {
+                status: newStatus,
+              },
+              note: statusNote || `Admin status updated to ${newStatus}`,
+            });
+          } else {
+            endpoint = `https://api.t-coin.code-studio4.com/api/agents/${user.id}/status`;
+            method = "PUT";
+            body = JSON.stringify({
+              status: newStatus,
+              note: statusNote || `Agent status updated to ${newStatus}`,
+            });
+          }
+          break;
       }
 
       const response = await fetch(endpoint, {
@@ -297,7 +242,21 @@ export function UserActions({
         throw new Error(errorData.message || "Action failed");
       }
 
-      // Call the appropriate callback after successful action
+      toast.success(
+        type === "approve"
+          ? `${user.type.toUpperCase()} approved successfully`
+          : type === "delete"
+          ? `${user.type.toUpperCase()} deleted successfully`
+          : type === "toggle"
+          ? `Remittance ${
+              !user.canReceiveRemittanceList ? "enabled" : "disabled"
+            } successfully`
+          : type === "assign"
+          ? "Admin assigned successfully"
+          : `Status updated to ${newStatus}`
+      );
+
+      // Call appropriate callbacks
       switch (type) {
         case "approve":
           onUserUpdate?.({ isApproved: true });
@@ -310,22 +269,11 @@ export function UserActions({
             canReceiveRemittanceList: !user.canReceiveRemittanceList,
           });
           break;
-        case "assign":
-          // Handle admin assignment updates if needed
+        case "status":
+          onStatusChange?.(newStatus);
           break;
       }
 
-      toast.success(
-        type === "approve"
-          ? `${user.type.toUpperCase()} approved successfully`
-          : type === "delete"
-          ? `${user.type.toUpperCase()} deleted successfully`
-          : type === "toggle"
-          ? `Remittance ${
-              !user.canReceiveRemittanceList ? "enabled" : "disabled"
-            } successfully`
-          : "Admin assigned successfully"
-      );
       onActionComplete?.();
     } catch (error) {
       console.error("Action error:", error);
@@ -334,8 +282,37 @@ export function UserActions({
       );
     } finally {
       setIsLoading(false);
+      setShowStatusDialog(false);
+      setShowDeleteConfirm(false);
     }
   };
+
+  const handleStatusNoteChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setStatusNote(e.target.value);
+  };
+
+  const handleAdminSelect = (value: string) => {
+    setSelectedAdminId(value);
+  };
+
+  const handleDropdownItemClick = (e: MouseEvent, action: string) => {
+    e.preventDefault();
+    switch (action) {
+      case "approve":
+        handleAction("approve");
+        break;
+      case "toggle":
+        handleAction("toggle");
+        break;
+      case "status":
+        setShowStatusDialog(true);
+        break;
+      case "assign":
+      default:
+        break;
+    }
+  };
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       {/* View Details Button */}
@@ -380,8 +357,12 @@ export function UserActions({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                   <InfoRow label="Type" value={user.type} />
                   <InfoRow
-                    label="Status"
+                    label="Approval Status"
                     value={user.isApproved ? "Approved" : "Pending"}
+                  />
+                  <InfoRow
+                    label="Account Status"
+                    value={user.status === "active" ? "Active" : "Hold"}
                   />
                   <InfoRow label="Country" value={user.country} />
                   <InfoRow label="City" value={user.city} />
@@ -408,19 +389,22 @@ export function UserActions({
             {/* Right Column - Documents */}
             <div className="space-y-4">
               {user.qr_code && (
-                <ImageBlock title="QR Code" src={user.qr_code} />
+                <Imageblocked title="QR Code" src={user.qr_code} />
               )}
               {user.nid_card_front_pic_url && (
-                <ImageBlock
+                <Imageblocked
                   title="NID Front"
                   src={user.nid_card_front_pic_url}
                 />
               )}
               {user.nid_card_back_pic_url && (
-                <ImageBlock title="NID Back" src={user.nid_card_back_pic_url} />
+                <Imageblocked
+                  title="NID Back"
+                  src={user.nid_card_back_pic_url}
+                />
               )}
               {user.passport_file_url && (
-                <ImageBlock title="Passport" src={user.passport_file_url} />
+                <Imageblocked title="Passport" src={user.passport_file_url} />
               )}
             </div>
           </div>
@@ -434,73 +418,73 @@ export function UserActions({
             size="sm"
             className="h-8 px-2"
             title="More actions"
+            onClick={(e: MouseEvent) => e.stopPropagation()}
           >
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
+          {/* Status Update Option */}
+          <DropdownMenuItem
+            onClick={(e: MouseEvent) => {
+              e.preventDefault();
+              setNewStatus(user.status as "active" | "hold" | "blocked"); // keep current status
+              setShowStatusDialog(true); // open the dialog for selection
+            }}
+            disabled={isLoading && actionType === "status"}
+          >
+            {isLoading && actionType === "status" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Power className="mr-2 h-4 w-4" />
+            )}
+            Update Status
+          </DropdownMenuItem>
+
           {/* Delete Action */}
           <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
             <DialogTrigger asChild>
               <DropdownMenuItem
-                onSelect={(e) => e.preventDefault()}
+                onSelect={(e: Event) => e.preventDefault()}
                 className="text-red-600 focus:text-red-600 focus:bg-red-50"
               >
                 <Trash className="mr-2 h-4 w-4" />
                 Delete User
               </DropdownMenuItem>
             </DialogTrigger>
-            <Dialog
-              open={showDeleteConfirm}
-              onOpenChange={setShowDeleteConfirm}
-            >
-              {/* <DialogTrigger asChild>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+              </DialogHeader>
+              <p>
+                Are you sure you want to delete <strong>{user.name}</strong>?
+              </p>
+              <div className="flex justify-end gap-2 mt-4">
                 <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
+                  variant="outline"
+                  onClick={() => setShowDeleteConfirm(false)}
                 >
-                  <Trash className="h-4 w-4" />
+                  Cancel
                 </Button>
-              </DialogTrigger> */}
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Confirm Deletion</DialogTitle>
-                </DialogHeader>
-                <p>
-                  Are you sure you want to delete <strong>{user.name}</strong>?
-                </p>
-                <div className="flex justify-end gap-2 mt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowDeleteConfirm(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      setShowDeleteConfirm(false);
-                      handleAction("delete");
-                    }}
-                    disabled={isLoading && actionType === "delete"}
-                  >
-                    {isLoading && actionType === "delete" ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      "Delete"
-                    )}
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+                <Button
+                  variant="destructive"
+                  onClick={() => handleAction("delete")}
+                  disabled={isLoading && actionType === "delete"}
+                >
+                  {isLoading && actionType === "delete" ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Delete"
+                  )}
+                </Button>
+              </div>
+            </DialogContent>
           </Dialog>
 
           {/* Approve Action */}
           {!user.isApproved && (
             <DropdownMenuItem
-              onClick={() => handleAction("approve")}
+              onClick={(e: MouseEvent) => handleDropdownItemClick(e, "approve")}
               disabled={isLoading && actionType === "approve"}
             >
               {isLoading && actionType === "approve" ? (
@@ -517,7 +501,9 @@ export function UserActions({
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={() => handleAction("toggle")}
+                onClick={(e: MouseEvent) =>
+                  handleDropdownItemClick(e, "toggle")
+                }
                 disabled={isLoading && actionType === "toggle"}
               >
                 {isLoading && actionType === "toggle" ? (
@@ -535,8 +521,10 @@ export function UserActions({
               <Dialog>
                 <DialogTrigger asChild>
                   <DropdownMenuItem
-                    onClick={fetchAdmins}
-                    onSelect={(e) => e.preventDefault()}
+                    onClick={(e: MouseEvent) => {
+                      e.preventDefault();
+                      fetchAdmins();
+                    }}
                   >
                     <UserCog className="mr-2 h-4 w-4" />
                     Assign Admin
@@ -553,7 +541,7 @@ export function UserActions({
                       </p>
                       <Select
                         value={selectedAdminId}
-                        onValueChange={setSelectedAdminId}
+                        onValueChange={handleAdminSelect}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select an admin" />
@@ -594,154 +582,79 @@ export function UserActions({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Action Buttons */}
-      {/* <div className="flex flex-wrap gap-2">
-        <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-          <DialogTrigger asChild>
-            <Button
-              size="sm"
-              variant="destructive"
-              onClick={() => setShowDeleteConfirm(true)}
-              className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirm Deletion</DialogTitle>
-            </DialogHeader>
-            <p>
-              Are you sure you want to delete <strong>{user.name}</strong>?
-            </p>
-            <div className="flex justify-end gap-2 mt-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowDeleteConfirm(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  setShowDeleteConfirm(false);
-                  handleAction("delete");
-                }}
-                disabled={isLoading && actionType === "delete"}
-              >
-                {isLoading && actionType === "delete" ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  "Delete"
+      {/* Status Update Dialog */}
+      <Dialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span>
+                {newStatus === "active" && (
+                  <Badge className="bg-green-500 text-white">Active</Badge>
                 )}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+                {newStatus === "hold" && (
+                  <Badge className="bg-yellow-500 text-white">Hold</Badge>
+                )}
+                {newStatus === "blocked" && (
+                  <Badge className="bg-red-500 text-white">blockeded</Badge>
+                )}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                Update {user.name} status
+              </span>
+            </DialogTitle>
+          </DialogHeader>
 
-        {!user.isApproved && (
-          <Button
-            size="sm"
-            className="bg-green-500 text-white hover:bg-green-600"
-            onClick={() => handleAction("approve")}
-            disabled={isLoading && actionType === "approve"}
-          >
-            {isLoading && actionType === "approve" ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              "Approve"
-            )}
-          </Button>
-        )}
+          <div className="space-y-4 mt-4">
+            {/* Status Selection */}
+            <Select
+              value={newStatus}
+              onValueChange={(val: "active" | "hold" | "blocked") =>
+                setNewStatus(val)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="hold">Hold</SelectItem>
+                <SelectItem value="blocked">blockeded</SelectItem>
+              </SelectContent>
+            </Select>
 
-        {user.type === "agent" && (
-          <Button
-            size="sm"
-            variant="outline"
-            className={`${
-              user.canReceiveRemittanceList
-                ? "bg-red-100 text-red-700 hover:bg-red-200"
-                : "bg-green-100 text-green-700 hover:bg-green-200"
-            }`}
-            onClick={() => handleAction("toggle")}
-            disabled={isLoading && actionType === "toggle"}
-          >
-            {isLoading && actionType === "toggle" ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : user.canReceiveRemittanceList ? (
-              "Disable Remittance"
-            ) : (
-              "Enable Remittance"
-            )}
-          </Button>
-        )}
+            {/* Optional Note */}
+            <Textarea
+              placeholder="Add a note (optional)"
+              value={statusNote}
+              onChange={handleStatusNoteChange}
+            />
+          </div>
 
-        {user.type === "agent" && (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                size="sm"
-                variant="outline"
-                className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
-                onClick={fetchAdmins}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Assign Admin
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Assign Admin to Agent</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Assigning admin to: {user.name}
-                  </p>
-                  <Select
-                    value={selectedAdminId}
-                    onValueChange={setSelectedAdminId}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select an admin" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {admins.length > 0 ? (
-                        admins.map((admin) => (
-                          <SelectItem key={admin.id} value={admin.id}>
-                            {admin.full_name} ({admin.email})
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <div className="p-2 text-sm text-muted-foreground">
-                          No admins available
-                        </div>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button
-                  onClick={() => handleAction("assign")}
-                  disabled={
-                    isLoading || !selectedAdminId || admins.length === 0
-                  }
-                  className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
-                >
-                  {isLoading && actionType === "assign" ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Assign Admin"
-                  )}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
-      </div> */}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowStatusDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => handleAction("status")}
+              disabled={isLoading && actionType === "status"}
+            >
+              {isLoading && actionType === "status" ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                "Confirm Update"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
+// Helper components
 function InfoRow({ label, value }: { label: string; value?: string | null }) {
   return (
     <div>
@@ -751,7 +664,7 @@ function InfoRow({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
-function ImageBlock({ title, src }: { title: string; src: string }) {
+function Imageblocked({ title, src }: { title: string; src: string }) {
   return (
     <div className="space-y-2">
       <h4 className="font-medium">{title}</h4>

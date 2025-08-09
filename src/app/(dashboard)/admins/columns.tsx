@@ -31,6 +31,7 @@ export type User = {
   accepted_terms?: boolean;
   birth_date?: string | null;
   institution_name?: string | null;
+  status: "active" | "hold" | "blocked";
   admin?: {
     id: number;
     name: string;
@@ -120,7 +121,7 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "isApproved",
-    header: "Status",
+    header: "isApproved",
     cell: ({ row }) => (
       <Badge
         className={`px-2 py-1 rounded-md ${
@@ -132,6 +133,32 @@ export const columns: ColumnDef<User>[] = [
         {row.original.isApproved ? "Approved" : "Pending"}
       </Badge>
     ),
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      console.log("Row data:", row.original);
+
+      const status = row.original.status?.toLowerCase();
+      return (
+        <Badge
+          className={
+            status === "active"
+              ? "bg-green-500 hover:bg-green-600 text-white"
+              : status === "hold"
+              ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+              : status === "blocked"
+              ? "bg-red-500 hover:bg-red-600 text-white"
+              : "bg-gray-500 hover:bg-gray-600 text-white"
+          }
+        >
+          {status
+            ? status.charAt(0).toUpperCase() + status.slice(1)
+            : "Unknown"}
+        </Badge>
+      );
+    },
   },
   {
     accessorKey: "canReceiveRemittanceList",

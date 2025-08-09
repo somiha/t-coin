@@ -54,12 +54,12 @@ const baseMenuItems: MenuItem[] = [
     icon: CreditCard,
     subItems: [
       { name: "All", href: "/transactions" },
-      { name: "Remittance", href: "/transactions/remittance" },
-      { name: "Send Money", href: "/transactions/send-money" },
-      { name: "Cash Out", href: "/transactions/cash-out" },
+      // { name: "Remittance", href: "/transactions/remittance" },
+      // { name: "Send Money", href: "/transactions/send-money" },
+      // { name: "Cash Out", href: "/transactions/cash-out" },
       { name: "T-coin Received", href: "/transactions/tcoin-receieved" },
       {
-        name: "T-coin Cash Out Request",
+        name: "T-coin Cash Out",
         href: "/transactions/tcoin-cash-request",
       },
     ],

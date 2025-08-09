@@ -36,6 +36,7 @@ interface ApiUser {
   accepted_terms?: boolean;
   birth_date?: string | null;
   institution_name?: string | null;
+  status: "active" | "hold" | "blocked";
   admin?: {
     id: number;
     name: string;
@@ -123,6 +124,7 @@ export default function Page() {
           accepted_terms: u.accepted_terms,
           birth_date: u.birth_date,
           institution_name: u.institution_name,
+          status: u.status,
           admin: {
             id: u.admin?.id || 0,
             name: u.admin?.name || "",
@@ -160,6 +162,7 @@ export default function Page() {
           accepted_terms: u.accepted_terms,
           birth_date: u.birth_date,
           institution_name: u.institution_name,
+          status: u.status,
           admin: {
             id: u.admin?.id || 0,
             name: u.admin?.name || "",

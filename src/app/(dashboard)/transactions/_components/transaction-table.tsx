@@ -130,8 +130,12 @@ export function TransactionsTable({
 
           local_currency_amount: item.local_currency_amount || "N/A",
         }));
+        const filteredAdminTransactions = transformedData.filter(
+          (transaction) =>
+            transaction.type === "admin" || transaction.type === "super_admin"
+        );
 
-        setTransactions(transformedData);
+        setTransactions(filteredAdminTransactions);
       } catch (err) {
         console.error("Fetch error:", err);
         setError(

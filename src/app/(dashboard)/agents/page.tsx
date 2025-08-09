@@ -1,9 +1,7 @@
-// app/(dashboard)/agents/page.tsx
 "use client";
 
 import { DataTable } from "../data-table";
 import { useEffect, useState } from "react";
-
 import { columns } from "./columns";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -16,6 +14,7 @@ interface ApiAgent {
   phone_no: string;
   isApproved: boolean;
   type: "agent";
+  status: "active" | "hold" | "blocked";
   image?: string | null;
   canReceiveRemittanceList?: boolean;
   address?: string | null;
@@ -91,6 +90,7 @@ export default function AgentsPage() {
     email: agent.email,
     phone: agent.phone_no,
     type: agent.type,
+    status: agent.status,
     isApproved: agent.isApproved,
     canReceiveRemittanceList: agent.canReceiveRemittanceList || false,
     image: agent.image,
@@ -112,6 +112,7 @@ export default function AgentsPage() {
     birth_date: agent.birth_date,
     institution_name: agent.institution_name,
   }));
+
   const filteredAgents = formattedAgents.filter((agent) => {
     const query = searchQuery.toLowerCase();
     return (
@@ -147,7 +148,6 @@ export default function AgentsPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-
                 <Search className="absolute p-1 h-6 w-6 text-gray-400 left-2 top-2" />
               </div>
             </div>
@@ -159,10 +159,6 @@ export default function AgentsPage() {
             ) : error ? (
               <div className="text-red-500 p-4">{error}</div>
             ) : (
-              // <DataTable
-              //   columns={columns(fetchAgents)}
-              //   data={formattedAgents}
-              // />
               <DataTable columns={columns(fetchAgents)} data={filteredAgents} />
             )}
           </div>

@@ -4,7 +4,16 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Trash2, ArrowUpDown, Loader2 } from "lucide-react";
+import {
+  Eye,
+  Trash2,
+  ArrowUpDown,
+  Loader2,
+  MoreVertical,
+  ToggleLeft,
+  ToggleRight,
+  Power,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -13,8 +22,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Image from "next/image";
+import { Textarea } from "@/components/ui/textarea";
 
 export type Agent = {
   id: string;
@@ -22,6 +39,7 @@ export type Agent = {
   email: string;
   phone: string;
   type: "agent";
+  status: "active" | "hold" | "blocked";
   isApproved: boolean;
   canReceiveRemittanceList?: boolean;
   image?: string | null;
@@ -52,9 +70,17 @@ function AgentActions({
   onActionComplete: () => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [actionType, setActionType] = useState<"delete" | "toggle">();
+  const [actionType, setActionType] = useState<
+    "delete" | "toggle" | "status"
+  >();
+  const [showStatusDialog, setShowStatusDialog] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [statusNote, setStatusNote] = useState("");
+  const [newStatus, setNewStatus] = useState<"active" | "hold" | "blocked">(
+    agent.status
+  );
 
-  const handleAction = async (type: "delete" | "toggle") => {
+  const handleAction = async (type: "delete" | "toggle" | "status") => {
     setActionType(type);
     setIsLoading(true);
 
@@ -80,6 +106,17 @@ function AgentActions({
         body = JSON.stringify({
           canReceiveRemittanceList: !agent.canReceiveRemittanceList,
         });
+      } else if (type === "status") {
+        endpoint = `https://api.t-coin.code-studio4.com/api/users/bulk-update/multiple`;
+        method = "PUT";
+        body = JSON.stringify({
+          userIds: [agent.id], // or multiple IDs if needed
+          userType: "agent",
+          updateData: {
+            status: newStatus,
+          },
+          note: statusNote || `Agent status updated to ${newStatus}`,
+        });
       }
 
       const response = await fetch(endpoint, {
@@ -98,11 +135,15 @@ function AgentActions({
       toast.success(
         type === "delete"
           ? "Agent deleted successfully"
-          : `Remittance ${
+          : type === "toggle"
+          ? `Remittance ${
               !agent.canReceiveRemittanceList ? "enabled" : "disabled"
             } successfully`
+          : `Status updated to ${newStatus}`
       );
       onActionComplete();
+      if (type === "status") setShowStatusDialog(false);
+      if (type === "delete") setShowDeleteConfirm(false);
     } catch (error) {
       console.error("Action error:", error);
       toast.error(
@@ -113,15 +154,21 @@ function AgentActions({
     }
   };
 
+  const handleStatusNoteChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setStatusNote(e.target.value);
+  };
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       {/* View Details Button */}
       <Dialog>
         <DialogTrigger asChild>
           <Button
-            className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
             variant="ghost"
             size="sm"
+            className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
           >
             <Eye className="h-4 w-4" />
           </Button>
@@ -133,7 +180,7 @@ function AgentActions({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left Column */}
             <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 {agent.image && (
                   <div className="relative h-24 w-24 min-w-[6rem]">
                     <Image
@@ -148,27 +195,6 @@ function AgentActions({
                   <h3 className="text-lg font-medium">{agent.name}</h3>
                   <p className="text-sm text-muted-foreground">{agent.email}</p>
                   <p className="text-sm text-muted-foreground">{agent.phone}</p>
-                  <div className="flex gap-2 mt-2">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-md ${
-                        agent.isApproved
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {agent.isApproved ? "Approved" : "Pending"}
-                    </span>
-                    <span
-                      className={`px-2 py-1 text-xs rounded-md ${
-                        agent.canReceiveRemittanceList
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      Remittance:{" "}
-                      {agent.canReceiveRemittanceList ? "Yes" : "No"}
-                    </span>
-                  </div>
                 </div>
               </div>
 
@@ -254,42 +280,162 @@ function AgentActions({
         </DialogContent>
       </Dialog>
 
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-2">
-        <Button
-          size="sm"
-          variant="destructive"
-          onClick={() => handleAction("delete")}
-          disabled={isLoading && actionType === "delete"}
-          className="bg-gradient-to-r from-[rgb(var(--gradient-from))] via-[rgb(var(--gradient-via))] to-[rgb(var(--gradient-to))] text-white hover:opacity-90"
-        >
-          {isLoading && actionType === "delete" ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Trash2 className="h-4 w-4" />
-          )}
-        </Button>
+      {/* Three Dots Menu */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 px-2"
+            title="More actions"
+          >
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          {/* Status Update Option */}
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.preventDefault();
+              setNewStatus(agent.status);
+              setShowStatusDialog(true);
+            }}
+            disabled={isLoading && actionType === "status"}
+          >
+            {isLoading && actionType === "status" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Power className="mr-2 h-4 w-4" />
+            )}
+            Update Status
+          </DropdownMenuItem>
 
-        <Button
-          size="sm"
-          variant="outline"
-          className={`${
-            agent.canReceiveRemittanceList
-              ? "bg-red-100 text-red-700 hover:bg-red-200"
-              : "bg-green-100 text-green-700 hover:bg-green-200"
-          }`}
-          onClick={() => handleAction("toggle")}
-          disabled={isLoading && actionType === "toggle"}
-        >
-          {isLoading && actionType === "toggle" ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : agent.canReceiveRemittanceList ? (
-            "Disable Remittance"
-          ) : (
-            "Enable Remittance"
-          )}
-        </Button>
-      </div>
+          {/* Delete Action */}
+          <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+            <DialogTrigger asChild>
+              <DropdownMenuItem
+                onSelect={(e) => e.preventDefault()}
+                className="text-red-600 focus:text-red-600 focus:bg-red-50"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Agent
+              </DropdownMenuItem>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+              </DialogHeader>
+              <p>
+                Are you sure you want to delete <strong>{agent.name}</strong>?
+              </p>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDeleteConfirm(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => handleAction("delete")}
+                  disabled={isLoading && actionType === "delete"}
+                >
+                  {isLoading && actionType === "delete" ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Delete"
+                  )}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Toggle Remittance */}
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.preventDefault();
+              handleAction("toggle");
+            }}
+            disabled={isLoading && actionType === "toggle"}
+          >
+            {isLoading && actionType === "toggle" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : agent.canReceiveRemittanceList ? (
+              <ToggleLeft className="mr-2 h-4 w-4" />
+            ) : (
+              <ToggleRight className="mr-2 h-4 w-4" />
+            )}
+            {agent.canReceiveRemittanceList
+              ? "Disable Remittance"
+              : "Enable Remittance"}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Status Update Dialog */}
+      <Dialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Badge
+                className={
+                  newStatus === "active"
+                    ? "bg-green-500 text-white"
+                    : newStatus === "hold"
+                    ? "bg-yellow-500 text-white"
+                    : "bg-red-500 text-white"
+                }
+              >
+                {newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}
+              </Badge>
+              <span className="text-sm text-muted-foreground">
+                Update {agent.name} status
+              </span>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-4">
+            {/* Status Selection */}
+            <select
+              value={newStatus}
+              onChange={(e) =>
+                setNewStatus(e.target.value as "active" | "hold" | "blocked")
+              }
+              className="w-full p-2 border rounded-md"
+            >
+              <option value="active">Active</option>
+              <option value="hold">Hold</option>
+              <option value="blocked">Blocked</option>
+            </select>
+
+            {/* Optional Note */}
+            <Textarea
+              placeholder="Add a note (optional)"
+              value={statusNote}
+              onChange={handleStatusNoteChange}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowStatusDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => handleAction("status")}
+              disabled={isLoading && actionType === "status"}
+            >
+              {isLoading && actionType === "status" ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                "Confirm Update"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -370,8 +516,34 @@ export const columns = (refreshData: () => void): ColumnDef<Agent>[] => [
     header: "Phone",
   },
   {
-    accessorKey: "isApproved",
+    accessorKey: "status",
     header: "Status",
+    cell: ({ row }) => {
+      console.log("Row data:", row.original);
+
+      const status = row.original.status?.toLowerCase();
+      return (
+        <Badge
+          className={
+            status === "active"
+              ? "bg-green-500 hover:bg-green-600 text-white"
+              : status === "hold"
+              ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+              : status === "blocked"
+              ? "bg-red-500 hover:bg-red-600 text-white"
+              : "bg-gray-500 hover:bg-gray-600 text-white"
+          }
+        >
+          {status
+            ? status.charAt(0).toUpperCase() + status.slice(1)
+            : "Unknown"}
+        </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: "isApproved",
+    header: "Approval",
     cell: ({ row }) => (
       <Badge
         variant="secondary"

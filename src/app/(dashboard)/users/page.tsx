@@ -45,6 +45,7 @@ interface UserApiResponse {
   nid_card_front_pic_url?: string;
   nid_card_back_pic_url?: string;
   referral_code?: string;
+  status: "active" | "hold" | "blocked";
 }
 
 export default function UsersPage() {
@@ -55,6 +56,55 @@ export default function UsersPage() {
   const [isSendingBroadcast, setIsSendingBroadcast] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.error("Missing authToken");
+        return;
+      }
+
+      const response = await fetch(
+        "https://api.t-coin.code-studio4.com/api/users",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to fetch users");
+
+      const data = await response.json();
+      if (data.success && Array.isArray(data.data)) {
+        const formatted = data.data.map(
+          (user: UserApiResponse): User => ({
+            id: String(user.id),
+            name: user.full_name || "N/A",
+            email: user.email || "N/A",
+            phone: user.phone_no || "N/A",
+            country: user.country || "N/A",
+            address: user.address || "N/A",
+            avatar: user.avatar || "/default-avatar.png",
+            status: user.status,
+          })
+        );
+        setUsers(formatted);
+        setFilteredUsers(formatted);
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      toast.error("Failed to load users");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -81,6 +131,7 @@ export default function UsersPage() {
               country: user.country || "N/A",
               address: user.address || "N/A",
               avatar: user.avatar || "/default-avatar.png",
+              status: user.status,
             })
           );
           setUsers(formatted);
@@ -196,7 +247,14 @@ export default function UsersPage() {
             {loading ? (
               <p>Loading...</p>
             ) : (
-              <DataTable columns={columns} data={filteredUsers} />
+              <DataTable
+                columns={columns}
+                data={filteredUsers}
+                meta={{
+                  refetchData: fetchUsers,
+                  refreshData: fetchUsers,
+                }}
+              />
             )}
           </div>
         </main>
